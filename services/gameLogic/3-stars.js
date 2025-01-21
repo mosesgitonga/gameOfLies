@@ -15,6 +15,7 @@ class ThreeStars {
         this.gameState = "waiting" //can be waiting, inProgress, gameOver
     }
 
+    
     // method to start the game 
     start() {
         if (this.gameState === "waiting") {
@@ -52,7 +53,7 @@ class ThreeStars {
           this.handleMill(player);
         }
     }
-    
+
 
 
 }
