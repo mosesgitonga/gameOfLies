@@ -1,0 +1,152 @@
+/* Overall styling */
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: radial-gradient(circle, #111, #222);
+  color: white;
+  font-family: "Orbitron", sans-serif;
+}
+#heading {
+  color: #ffcc00;
+}
+.container {
+  display: flex;
+  /* border: 1px solid green; */
+  width: 100vw;
+  height: 85vh;
+  justify-content: space-around;
+
+}
+.details {
+  padding: 10px;
+  height: 100vh;
+  
+  border: 2px solid #fffdfd;
+}
+/* Game title */
+h1, h2 {
+  text-align: center;
+  margin: 10px;
+}
+
+/* Board container */
+.board-container {
+  position: relative;
+  width: 450px;
+  height: 450px;
+  background: linear-gradient(145deg, #444, #222);
+  border: 10px solid #666;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.2);
+}
+
+/* Position markers (clickable areas) */
+.position-marker {
+  width: 70px;
+  height: 70px;
+  border: 3px dashed rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.5);
+  transition: all 0.2s ease-in-out;
+}
+
+/* Hover effect on clickable areas */
+.position-marker:hover {
+  border-color: white;
+  cursor: pointer;
+  transform: translate(-50%, -50%) scale(1.1);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Pieces */
+.piece {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s ease, background 0.3s ease-in-out;
+}
+
+/* X Player */
+.piece.X {
+  background: radial-gradient(circle, rgb(255, 3, 255), rgb(111, 0, 139));
+  color: white;
+  border: 3px solid rgba(255, 0, 200, 0.8);
+  box-shadow: 0 0 15px rgb(213, 6, 255);
+}
+
+/* O Player */
+.piece.O {
+  background: radial-gradient(circle, dodgerblue, rgb(11, 11, 189));
+  color: white;
+  border: 3px solid rgba(0, 0, 255, 0.8);
+  box-shadow: 0 0 15px blue;
+}
+
+/* Hover effect for pieces */
+.piece:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
+}
+
+/* Selected piece */
+.piece.selected {
+  border: 4px solid yellow;
+  box-shadow: 0 0 25px yellow;
+  transform: scale(1.2);
+}
+
+/* Winning animation */
+.celebration {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 30px;
+  color: gold;
+  animation: pop 0.5s ease-in-out alternate infinite;
+}
+
+/* Pop animation for celebration */
+@keyframes pop {
+  0% { transform: translateX(-50%) scale(1); }
+  100% { transform: translateX(-50%) scale(1.2); }
+}
+
+/* Restart button */
+button {
+  margin-top: 20px;
+  padding: 12px 24px;
+  font-size: 18px;
+  font-weight: bold;
+  background: linear-gradient(to right, #ffcc00, #ff9900);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+button:hover {
+  background: linear-gradient(to right, #ff9900, #ff6600);
+  transform: scale(1.1);
+}
