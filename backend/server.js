@@ -1,22 +1,26 @@
-const express = require("express");
-const http = require("http");
-const { Server } = require("socket.io");
-const cors = require("cors");
+import express from 'express'
+import http from 'http'
+import { Server } from "socket.io";
+import cors from 'cors'
+import authRouter from "./routes/authRoute.js";
 
 const app = express();
 
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true })); 
 app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
     next();
 });
 app.use(cors());
 
+app.use(authRouter)
+
+
 const rooms = {}
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "http://localhost:5173" } });
 
-  
-  
   io.on("connection", (socket) => {
     console.log("A user connected:", socket.id);
   
@@ -26,7 +30,9 @@ const io = new Server(server, { cors: { origin: "http://localhost:5173" } });
       }
   
       // If room already has two players, reject the third player
+      console.log(rooms[roomId].players.length)
       if (rooms[roomId].players.length >= 2) {
+        //console.log('room is full')
         socket.emit("roomFull");
         return;
       }
