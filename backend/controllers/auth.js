@@ -1,11 +1,13 @@
 import Engine from "../prisma/engine.js";
 import bcrypt from 'bcrypt';
 import Helper from "../utils/helpers.js";
+import User from "./users.js";
 
 class Auth {
     constructor() {
         this.engine = new Engine();
         this.helper = new Helper();
+        this.user = new User() 
     }
 
     async register(req, res) {
@@ -13,11 +15,10 @@ class Auth {
             const { email, username, password } = req.body;
         
             const existingUser = await this.engine.get('User', 'email', email);
-            console.log('user', existingUser)
             if (existingUser) {
                 return res.status(409).json({ "message": "Email already exists" });
             }
-      
+            
             const existingUsername = await this.engine.get('User', 'username', username)
             if (existingUsername) {
                 return res.status(409).json({"message": "Username already exists"})
@@ -32,6 +33,8 @@ class Auth {
             };
 
             await this.engine.create('User', newData);
+            await this.user.createRole(newData.id);
+
             return res.status(201).json({ "message": "User registered successfully" });
 
         } catch (error) {
@@ -54,7 +57,7 @@ class Auth {
                 return res.status(403).json({ "message": "Invalid email or password" });
             }
 
-            const payload = { id: existingUser.id, email };
+            const payload = { id: existingUser.id, email, roleId: existingUser.role_id };
             const access_token =  this.helper.generateAccessToken(payload);
             const refresh_token = await this.helper.generateRefreshToken(payload);
 

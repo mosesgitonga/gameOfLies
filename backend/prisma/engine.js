@@ -26,7 +26,7 @@ class Engine {
     }
     
 
-    async all(className, pagination = false, page = 1, pageSize = 20) {
+    async all(className, pagination=false, page=1, pageSize = 20) {
         try {
             if (!className) {
                 throw new Error("class name is missing")
