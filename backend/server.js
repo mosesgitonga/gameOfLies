@@ -29,7 +29,6 @@ const io = new Server(server, { cors: { origin: "http://localhost:5173" } });
         rooms[roomId] = { players: [], pieces: {}, currentPlayer: "X", placedPieces: { X: 0, O: 0 }, winner: null };
       }
   
-      // If room already has two players, reject the third player
       console.log(rooms[roomId].players.length)
       if (rooms[roomId].players.length >= 2) {
         //console.log('room is full')
@@ -37,12 +36,12 @@ const io = new Server(server, { cors: { origin: "http://localhost:5173" } });
         return;
       }
   
-      // assigns symbol
+      // assignig  symbol
       const playerSymbol = rooms[roomId].players.length === 0 ? "X" : "O";
       rooms[roomId].players.push({ id: socket.id, symbol: playerSymbol });
   
       socket.join(roomId);
-      socket.emit("assignSymbol", playerSymbol);
+      socket.emit("assignSymbol", playerSymbol)
   
       console.log(`Player ${socket.id} joined room ${roomId} as ${playerSymbol}`);
     });
@@ -105,7 +104,7 @@ const io = new Server(server, { cors: { origin: "http://localhost:5173" } });
     for (let pattern of winningPatterns) {
       const [a, b, c] = pattern;
       if (pieces[a] && pieces[a] === pieces[b] && pieces[a] === pieces[c]) {
-        return pieces[a]; // Return the winner ("X" or "O")
+        return pieces[a];
       }
     }
     return null;
