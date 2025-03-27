@@ -25,30 +25,77 @@ class Engine {
         }
     }
     
+    async getWhere(className, filters = {}) {
+        /**
+         * Fetches multiple records from a Prisma table where conditions match.
+         * @param {string} className - The Prisma model name
+         * @param {Object} filters - Dictionary of filter conditions { field: value }
+         * @returns {Array} - Array of matching records
+         */
+        if (!className || Object.keys(filters).length === 0) {
+            throw new Error("Model name and at least one filter condition are required.");
+        }
 
-    async all(className, pagination=false, page=1, pageSize = 20) {
         try {
-            if (!className) {
-                throw new Error("class name is missing")
-            }
             if (!this.prisma[className]) {
-                throw new Error(`Table ${className} does not exist`)
+                throw new Error(`Table ${className} does not exist`);
             }
 
-            const queryOptions = {};
-            if (pagination) {
-                queryOptions.take = pageSize;
-                queryOptions.skip = (page - 1) * pageSize;
-            }
+            const results = await this.prisma[className].findMany({
+                where: filters
+            });
 
-            return await this.prisma[className].findMany(queryOptions)
+            return results;
         } catch (error) {
-            console.error(error)
-            throw new Error("Internal Server Error")
+            console.error("Database Error:", error);
+            throw new Error("Internal Server Error");
         }
     }
 
-    async update(className, data, idField = "id") {
+    async all(className, queryOptions = {}, pagination = false, page = 1, pageSize = 20) {
+        try {
+            if (!className) {
+                throw new Error("Class name is missing");
+            }
+            
+            if (typeof className !== "string") {
+                throw new Error("Class name must be a string");
+            }
+            
+            if (!queryOptions || typeof queryOptions !== "object") {
+                throw new Error("Query options must be an object");
+            }
+            
+            if (pagination) {
+                page = parseInt(page, 10);
+                pageSize = parseInt(pageSize, 10);
+    
+                if (isNaN(page) || page < 1) {
+                    throw new Error("Page number must be a positive integer");
+                }
+    
+                if (isNaN(pageSize) || pageSize < 1 || pageSize > 100) {
+                    throw new Error("Page size must be between 1 and 100");
+                }
+    
+                queryOptions.take = pageSize;
+                queryOptions.skip = (page - 1) * pageSize;
+            }
+    
+            const records = await this.prisma[className]?.findMany(queryOptions);
+    
+            if (!records) {
+                throw new Error(`Failed to retrieve data for '${className}'`);
+            }
+    
+            return records;
+        } catch (error) {
+            console.error("Error fetching records:", error.message);
+            throw new Error(`Failed to fetch data: ${error.message}`);
+        }
+    }
+    
+    async update(className, targetId, updateFields, idField="id") {
         try {
             if (!className) {
                 throw new Error("classname field is missing");
@@ -56,30 +103,33 @@ class Engine {
             if (!this.prisma[className]) {
                 throw new Error(`Table '${className}' does not exist`);
             }
-            if (!data || typeof data !== "object") {
-                throw new Error("data is not specified or not an object");
+            if (!targetId) {
+                throw new Error(`Missing '${idField}' field`);
             }
-            if (!data[idField]) {
-                throw new Error(`Missing '${idField}' field in data`);
+            if (!updateFields || typeof updateFields !== "object" || Object.keys(updateFields).length === 0) {
+                throw new Error("Update fields must be a non-empty object");
             }
     
+            // Check if record exists
             const existingRecord = await this.prisma[className].findUnique({
-                where: { [idField]: data[idField] }
+                where: { [idField]: targetId }
             });
-
+    
             if (!existingRecord) {
-                throw new Error(`Record with ${idField}=${data[idField]} not found`);
+                throw new Error(`Record with ${idField}=${targetId} not found`);
             }
     
+            // Update the record
             return await this.prisma[className].update({
-                where: { [idField]: data[idField] },
-                data
+                where: { [idField]: targetId },
+                data: updateFields
             });
         } catch (error) {
             console.error(error);
             throw new Error("Internal Server Error");
         }
     }
+    
 
     async create(className, data) {
         if (!className || !data) {

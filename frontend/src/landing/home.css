@@ -1,152 +1,135 @@
-/* Overall styling */
-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background: radial-gradient(circle, #111, #222);
-  color: white;
-  font-family: "Orbitron", sans-serif;
+.homeContainer {
+    max-width: 100vw;
+    height:fit-content;
+    margin: auto;
+    text-align: center;
 }
-#heading {
-  color: #ffcc00;
-}
-.container {
-  display: flex;
-  /* border: 1px solid green; */
-  width: 100vw;
-  height: 85vh;
-  justify-content: space-around;
 
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: radial-gradient(circle, #af9c9c, #222);
+    color: #32caca;
+    padding: 10px;
 }
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 15px;
+}
+
+.profile-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.menuSection {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    width: 200px;
+}
+
+.menuList {
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 20px;
+    background-color: #333;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid #32caca;
+
+    box-shadow: 0 4px 6px rgba(245, 228, 228, 0.1);
+}
+
+.menuItem {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #32caca;
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid #000;
+
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.menuItem:hover {
+    background: #333;
+    color: white;
+    transform: translateY(-2px);
+}
+
 .details {
-  padding: 10px;
-  height: 100vh;
-  
-  border: 2px solid #fffdfd;
-}
-/* Game title */
-h1, h2 {
-  text-align: center;
-  margin: 10px;
+    margin-top: 30px;
+    border: 0.01px solid #32caca;
+    border-radius: 5px;
+    height:fit-content;
+    padding: 30px;
+    width:fit-content;
+    background-color: #333;
+
+
 }
 
-/* Board container */
-.board-container {
-  position: relative;
-  width: 450px;
-  height: 450px;
-  background: linear-gradient(145deg, #444, #222);
-  border: 10px solid #666;
-  border-radius: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.2);
+.gameList {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
 }
 
-/* Position markers (clickable areas) */
-.position-marker {
-  width: 70px;
-  height: 70px;
-  border: 3px dashed rgba(255, 255, 255, 0.3);
-  border-radius: 10px;
-  position: absolute;
-  transform: translate(-50%, -50%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 14px;
-  font-weight: bold;
-  color: rgba(255, 255, 255, 0.5);
-  transition: all 0.2s ease-in-out;
+.gameItem {
+    color: white;
+    padding: 1px 5px;
+    border: 1px solid #000;
+
+    /* border-radius: 50px; */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 50vw;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-/* Hover effect on clickable areas */
-.position-marker:hover {
-  border-color: white;
-  cursor: pointer;
-  transform: translate(-50%, -50%) scale(1.1);
-  background: rgba(255, 255, 255, 0.1);
+.gameItem:hover {
+    transform: translateY(-3px);
+    box-shadow: 4px 6px 10px rgba(255, 254, 254, 0.15);
 }
 
-/* Pieces */
-.piece {
-  position: absolute;
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 40px;
-  font-weight: bold;
-  cursor: pointer;
-  user-select: none;
-  transition: transform 0.2s ease, background 0.3s ease-in-out;
+.gameItem span {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #32caca;
 }
 
-/* X Player */
-.piece.X {
-  background: radial-gradient(circle, rgb(255, 3, 255), rgb(111, 0, 139));
-  color: white;
-  border: 3px solid rgba(255, 0, 200, 0.8);
-  box-shadow: 0 0 15px rgb(213, 6, 255);
+.gameItem button {
+    background: #32caca;
+    color: rgb(255, 252, 252);
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s ease-in-out;
 }
 
-/* O Player */
-.piece.O {
-  background: radial-gradient(circle, dodgerblue, rgb(11, 11, 189));
-  color: white;
-  border: 3px solid rgba(0, 0, 255, 0.8);
-  box-shadow: 0 0 15px blue;
-}
-
-/* Hover effect for pieces */
-.piece:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
-}
-
-/* Selected piece */
-.piece.selected {
-  border: 4px solid yellow;
-  box-shadow: 0 0 25px yellow;
-  transform: scale(1.2);
-}
-
-/* Winning animation */
-.celebration {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 30px;
-  color: gold;
-  animation: pop 0.5s ease-in-out alternate infinite;
-}
-
-/* Pop animation for celebration */
-@keyframes pop {
-  0% { transform: translateX(-50%) scale(1); }
-  100% { transform: translateX(-50%) scale(1.2); }
-}
-
-/* Restart button */
-button {
-  margin-top: 20px;
-  padding: 12px 24px;
-  font-size: 18px;
-  font-weight: bold;
-  background: linear-gradient(to right, #ffcc00, #ff9900);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-}
-
-button:hover {
-  background: linear-gradient(to right, #ff9900, #ff6600);
-  transform: scale(1.1);
+.gameItem button:hover {
+    background: #000000;
+    box-shadow: 0px 0px 1000px 120px #fff;
 }

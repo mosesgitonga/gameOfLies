@@ -13,7 +13,7 @@ class Auth {
     async register(req, res) {
         try {
             const { email, username, password } = req.body;
-        
+    
             const existingUser = await this.engine.get('User', 'email', email);
             if (existingUser) {
                 return res.status(409).json({ "message": "Email already exists" });
@@ -23,25 +23,37 @@ class Auth {
             if (existingUsername) {
                 return res.status(409).json({"message": "Username already exists"})
             }
-            const hashedPassword = await bcrypt.hash(password, 10);
-
+    
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+    
+            const userId = this.helper.generateUuid();
             const newData = {
-                id: this.helper.generateUuid(),
-                email: email,
-                username: username,
+                id: userId,
+                email,
+                username,
                 password: hashedPassword
             };
-
+    
             await this.engine.create('User', newData);
-            await this.user.createRole(newData.id);
-
+            
+            // asign role to user
+            const role = await this.user.createRole();
+            if (!role || !role.id) {
+                console.error("Failed to assign role to user");
+                return res.status(500).json({ "error": "Role assignment failed" });
+            }
+    
+            await this.engine.update("User", userId, { role_id: role.id });
+    
             return res.status(201).json({ "message": "User registered successfully" });
-
+    
         } catch (error) {
             console.error(error);
             return res.status(500).json({ "error": "Internal Server Error" });
         }
     }
+    
 
     async login(req, res) {
         try {

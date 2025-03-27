@@ -1,10 +1,16 @@
 import React from "react";
-import GameBoard from "./landing/home"; 
+import { Routes, Route } from "react-router-dom";
+import GameBoard from "./board/GameBoard";
+import Home from "./landing/Home";
+
 
 const App = () => {
   return (
     <div className="app-container">
-      <GameBoard />
+      <Routes>
+        <Route path="/game" element={<GameBoard />} />
+        <Route path="/home" element={<Home />} />
+      </Routes>
     </div>
   );
 };

@@ -2,6 +2,7 @@ import express from 'express'
 import http from 'http'
 import { Server } from "socket.io";
 import cors from 'cors'
+import routesInjector from './routes/routesInjector.js';
 import authRouter from "./routes/authRoute.js";
 
 const app = express();
@@ -14,7 +15,8 @@ app.use((req, res, next) => {
 });
 app.use(cors());
 
-app.use(authRouter)
+routesInjector(app)
+//app.use(authRouter)
 
 
 const rooms = {}
