@@ -1,153 +1,294 @@
-/* Overall styling */
-body {
+:root {
+  --primary-bg: #121212;
+  --secondary-bg: #222;
+  --tertiary-bg: #333;
+  --text-primary: #ecf1f1;
+  --text-secondary: #8f9797;
+  --x-color: rgb(255, 3, 255);
+  --o-color: rgb(115, 255, 0);
+  --error-color: #ff4444;
+  --transition-timing: 0.3s ease;
+  --board-border: rgba(255, 255, 255, 0.1);
+}
+
+/* Main Container */
+.gameboard-container {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--primary-bg);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  background: radial-gradient(circle, #111, #222);
-  color: white;
-  font-family: "Orbitron", sans-serif;
-}
-#heading {
-  color: #ccc2c2,;
-}
-.container {
-  display: flex;
-  /* border: 1px solid green; */
-  width: 100vw;
-  height: 85vh;
-  justify-content: space-around;
-
-}
-.details {
-  padding: 10px;
-  height: 100vh;
-  
-  border: 2px solid #fffdfd;
-}
-/* Game title */
-h1, h2 {
-  text-align: center;
-  margin: 10px;
-}
-
-/* Board container */
-.board-container {
+  padding: clamp(1rem, 2vw, 2rem);
+  color: var(--text-primary);
   position: relative;
-  width: 450px;
-  height: 450px;
-  background: linear-gradient(to right, #32caca, #444);
-  border: 10px dashed #ffffff;
-  border-radius: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.2);
+  margin: 0;
 }
 
-/* Position markers (clickable areas) */
-.position-marker {
-  width: 70px;
-  height: 70px;
-  border: 3px dashed rgba(207, 192, 192, 0.192);
-  border-radius: 10px;
-  position: absolute;
-  transform: translate(-50%, -50%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 14px;
-  font-weight: bold;
-  color: rgba(255, 255, 255, 0.5);
-  transition: all 0.2s ease-in-out;
+/* Heading */
+#gameboard-heading {
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  margin: clamp(1rem, 3vw, 1.5rem) 0;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Hover effect on clickable areas */
-.position-marker:hover {
-  border-color: white;
+/* Join Room Section */
+.gameboard-join-room {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.75rem, 2vw, 1rem);
+  background: var(--secondary-bg);
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  width: min(90%, 400px);
+}
+
+.gameboard-room-input {
+  padding: clamp(0.5rem, 1.5vw, 0.75rem);
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  border: 1px solid var(--text-secondary);
+  border-radius: 0.25rem;
+  background: var(--tertiary-bg);
+  color: var(--text-primary);
+  width: 100%;
+  transition: border-color var(--transition-timing);
+}
+
+.gameboard-room-input:focus {
+  outline: none;
+  border-color: var(--text-primary);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+.gameboard-join-button {
+  padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(1rem, 2vw, 1.5rem);
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  background: var(--text-secondary);
+  color: var(--primary-bg);
+  border: none;
+  border-radius: 0.25rem;
   cursor: pointer;
-  transform: translate(-50%, -50%) scale(1.1);
-  background: rgba(255, 255, 255, 0.1);
+  transition: all var(--transition-timing);
+  width: 100%;
+  font-weight: 600;
 }
 
-/* Pieces */
-.piece {
+.gameboard-join-button:hover {
+  background: #fff;
+  transform: scale(1.05);
+}
+
+/* Game Content */
+.gameboard-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  flex-grow: 1;
+  justify-content: center;
+}
+
+/* Board Container */
+.gameboard-board-container {
+  position: relative;
+  width: min(90vw, 450px);
+  height: min(90vw, 450px);
+  margin: 0 auto;
+  background: linear-gradient(145deg, #1a1a1a, #121212);
+  border: 4px dashed var(--board-border);
+  border-radius: 15px;
+  box-shadow: 
+    0 0 20px rgba(0, 0, 0, 0.5),
+    0 0 10px rgba(255, 255, 255, 0.05) inset;
+}
+
+/* SVG Lines */
+.gameboard-lines {
   position: absolute;
-  width: 70px;
-  height: 70px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.gameboard-lines line {
+  stroke: rgba(255, 255, 255, 0.15);
+  stroke-width: clamp(1px, 0.5vw, 2px);
+  stroke-linecap: round;
+}
+
+/* Position Markers */
+.gameboard-position-marker {
+  position: absolute;
+  width: clamp(30px, 8vw, 60px);
+  height: clamp(30px, 8vw, 60px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed var(--board-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+  color: rgba(255, 255, 255, 0.3);
+  transition: all var(--transition-timing);
+}
+
+.gameboard-position-marker:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* Game Pieces */
+.gameboard-piece {
+  position: absolute;
+  width: clamp(40px, 10vw, 70px);
+  height: clamp(40px, 10vw, 70px);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 40px;
+  font-size: clamp(20px, 6vw, 40px);
   font-weight: bold;
   cursor: pointer;
   user-select: none;
-  transition: transform 0.2s ease, background 0.3s ease-in-out;
+  transition: all 0.2s ease;
+  transform: translate(-50%, -50%);
+  border: 2px solid transparent;
+  box-shadow: 
+    0 0 15px currentColor,
+    0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* X Player */
-.piece.X {
-  background: radial-gradient(circle, rgb(255, 3, 255), rgb(111, 0, 139));
+.gameboard-piece.X {
+  background: radial-gradient(circle, var(--x-color), rgb(111, 0, 139));
   color: white;
-  border: 3px solid rgba(255, 0, 200, 0.8);
-  box-shadow: 0 0 15px rgb(213, 6, 255);
+  border-color: rgba(255, 0, 200, 0.8);
 }
 
-/* O Player */
-.piece.O {
-  background: radial-gradient(circle, rgb(75, 255, 30), rgba(10, 97, 17, 0.486));
+.gameboard-piece.O {
+  background: radial-gradient(circle, var(--o-color), rgba(10, 97, 17, 0.486));
   color: white;
-  border: 3px solid rgba(115, 255, 0, 0.8);
-  box-shadow: 0 0 15px rgb(115, 255, 0);
+  border-color: rgba(115, 255, 0, 0.8);
 }
 
-/* Hover effect for pieces */
-.piece:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
+.gameboard-piece:hover {
+  transform: translate(-50%, -50%) scale(1.1);
 }
 
-/* Selected piece */
-.piece.selected {
-  border: 4px dashed #fff;
+.gameboard-piece.selected {
+  border: 3px dashed #fff;
   box-shadow: 0 0 25px #fff;
-  transform: scale(1.2);
+  transform: translate(-50%, -50%) scale(1.2);
+  animation: pulse 1.5s infinite;
 }
 
-/* Winning animation */
-.celebration {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 30px;
-  color: #ffdd1eef;
-  animation: pop 0.5s ease-in-out alternate infinite;
+@keyframes pulse {
+  0% { transform: translate(-50%, -50%) scale(1.2); }
+  50% { transform: translate(-50%, -50%) scale(1.25); }
+  100% { transform: translate(-50%, -50%) scale(1.2); }
 }
 
-/* Pop animation for celebration */
-@keyframes pop {
-  0% { transform: translateX(-50%) scale(1); }
-  100% { transform: translateX(-50%) scale(1.2); }
+/* Details Section */
+.gameboard-details {
+  text-align: center;
+  margin-bottom: clamp(0.75rem, 2vw, 1rem);
 }
 
-/* Restart button */
-button {
-  margin-top: 20px;
-  padding: 18px 34px;
-  font-size: 18px;
-  height: fit-content;
-  font-weight: bold;
-  background: linear-gradient(to right, #444, #fff);
+.gameboard-player-turn {
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
+  margin: clamp(0.75rem, 2vw, 1rem) 0;
+  transition: color var(--transition-timing);
+}
+
+.gameboard-player-turn.X {
+  color: var(--x-color);
+  text-shadow: 0 0 8px rgba(255, 3, 255, 0.3);
+}
+
+.gameboard-player-turn.O {
+  color: var(--o-color);
+  text-shadow: 0 0 8px rgba(115, 255, 0, 0.3);
+}
+
+.gameboard-details h3,
+.gameboard-details h4 {
+  margin: clamp(0.25rem, 1vw, 0.5rem) 0;
+  font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+  color: var(--text-secondary);
+}
+
+.gameboard-restart-button {
+  margin-top: clamp(1rem, 2vw, 1.5rem);
+  padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(1rem, 2vw, 1.5rem);
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  background: var(--text-secondary);
+  color: var(--primary-bg);
   border: none;
-  border-radius: 5px;
+  border-radius: 0.25rem;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: all var(--transition-timing);
+  font-weight: 600;
 }
 
-button:hover {
-  background: linear-gradient(to right, #fff, #444);
-  transform: scale(1.1);
+.gameboard-restart-button:hover {
+  background: #fff;
+  transform: scale(1.05);
+}
+
+/* Error Message */
+.gameboard-error-message {
+  color: var(--error-color);
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
+  margin-top: clamp(0.25rem, 1vw, 0.5rem);
+  text-align: center;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .gameboard-container {
+    padding: clamp(0.75rem, 1.5vw, 1rem);
+  }
+  
+  .gameboard-board-container {
+    width: min(90vw, 400px);
+    height: min(90vw, 400px);
+  }
+
+  .gameboard-lines line {
+    stroke-width: clamp(1px, 0.4vw, 1.5px);
+  }
+}
+
+@media (max-width: 480px) {
+  .gameboard-join-room {
+    padding: clamp(0.75rem, 2vw, 1rem);
+    width: 90%;
+  }
+  
+  .gameboard-piece {
+    width: clamp(30px, 12vw, 50px);
+    height: clamp(30px, 12vw, 50px);
+    font-size: clamp(16px, 6vw, 28px);
+  }
+
+  .gameboard-position-marker {
+    width: clamp(25px, 7vw, 40px);
+    height: clamp(25px, 7vw, 40px);
+    font-size: clamp(0.6rem, 2vw, 0.8rem);
+  }
 }

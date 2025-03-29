@@ -1,7 +1,7 @@
-import express from 'express'
-import http from 'http'
+import express from 'express';
+import http from 'http';
 import { Server } from "socket.io";
-import cors from 'cors'
+import cors from 'cors';
 import routesInjector from './routes/routesInjector.js';
 import authRouter from "./routes/authRoute.js";
 
@@ -15,100 +15,156 @@ app.use((req, res, next) => {
 });
 app.use(cors());
 
-routesInjector(app)
-//app.use(authRouter)
+routesInjector(app);
 
-
-const rooms = {}
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "http://localhost:5173" } });
 
-  io.on("connection", (socket) => {
+const rooms = {};
+
+io.on("connection", (socket) => {
     console.log("A user connected:", socket.id);
-  
-    socket.on("joinRoom", (roomId) => {
-      if (!rooms[roomId]) {
-        rooms[roomId] = { players: [], pieces: {}, currentPlayer: "X", placedPieces: { X: 0, O: 0 }, winner: null };
-      }
-  
-      console.log(rooms[roomId].players.length)
-      if (rooms[roomId].players.length >= 2) {
-        //console.log('room is full')
-        socket.emit("roomFull");
-        return;
-      }
-  
-      // assignig  symbol
-      const playerSymbol = rooms[roomId].players.length === 0 ? "X" : "O";
-      rooms[roomId].players.push({ id: socket.id, symbol: playerSymbol });
-  
-      socket.join(roomId);
-      socket.emit("assignSymbol", playerSymbol)
-  
-      console.log(`Player ${socket.id} joined room ${roomId} as ${playerSymbol}`);
-    });
-  
-    socket.on("makeMove", ({ pos, player, selectedPiece, roomId }) => {
-      const room = rooms[roomId];
-      if (!room || room.winner || room.currentPlayer !== player) return; // invalid moves
-  
-      if (room.placedPieces[player] < 3) {
-        // Placing a piece
-        if (!room.pieces[pos]) {
-          room.pieces[pos] = player;
-          room.placedPieces[player] += 1;
+
+    socket.on("joinRoom", ({ roomId, userId }) => {
+        console.log("joinRoom received:", { roomId, userId });
+
+        if (!userId) {
+            socket.emit("roomError", "User ID is required to join a room.");
+            return;
         }
-      } else {
-        // Move a piece
-        if (selectedPiece && room.pieces[selectedPiece] === player && !room.pieces[pos]) {
-          room.pieces[pos] = player;
-          delete room.pieces[selectedPiece];
+
+        if (typeof roomId !== "string") {
+            socket.emit("roomError", "Invalid room ID.");
+            return;
         }
-      }
-  
-      // Check for a winner
-      const winner = checkWinner(room.pieces);
-      if (winner) room.winner = winner;
-  
-      // Switch turn
-      room.currentPlayer = room.currentPlayer === "X" ? "O" : "X";
-  
-      // Broadcast new game state
-      io.to(roomId).emit("gameState", {
-        roomId,
-        pieces: room.pieces,
-        currentPlayer: room.currentPlayer,
-        winner: room.winner,
-        placedPieces: room.placedPieces
-      });
-  
-      console.log(`Move made in room ${roomId}:`, room.pieces);
+
+        if (!rooms[roomId]) {
+            rooms[roomId] = { 
+                players: {}, 
+                pieces: {}, 
+                currentPlayer: "X", 
+                placedPieces: { X: 0, O: 0 }, 
+                winner: null,
+                gameStarted: false // Track if game has started
+            };
+        }
+
+        const room = rooms[roomId];
+
+        if (Object.keys(room.players).length >= 2 && !room.players[userId]) {
+            socket.emit("roomError", "Room is full.");
+            return;
+        }
+
+        if (!room.players[userId]) {
+            const playerSymbol = Object.keys(room.players).length === 0 ? "X" : "O";
+            room.players[userId] = { symbol: playerSymbol, socketId: socket.id };
+        } else {
+            room.players[userId].socketId = socket.id;
+        }
+
+        const playerSymbol = room.players[userId].symbol;
+
+        socket.join(roomId);
+        socket.emit("assignSymbol", { userId, symbol: playerSymbol });
+
+        // Check if both players are present
+        const playerCount = Object.keys(room.players).length;
+        if (playerCount === 2 && !room.gameStarted) {
+            room.gameStarted = true;
+            io.to(roomId).emit("gameReady", { roomId });
+            console.log(`Game started in room ${roomId}`);
+        }
+
+        io.to(roomId).emit("gameState", {
+            roomId,
+            pieces: room.pieces,
+            currentPlayer: room.currentPlayer,
+            winner: room.winner,
+            placedPieces: room.placedPieces,
+            gameStarted: room.gameStarted
+        });
+
+        console.log(`Player ${userId} joined room ${roomId} as ${playerSymbol} with socket ${socket.id}`);
     });
-  
+
+    socket.on("makeMove", ({ pos, player, selectedPiece, roomId, userId }) => {
+        const room = rooms[roomId];
+        if (!room || !room.gameStarted || room.winner || room.currentPlayer !== player) {
+            socket.emit("roomError", "Game not started or invalid move.");
+            return;
+        }
+
+        if (!room.players[userId] || room.players[userId].symbol !== player) {
+            socket.emit("roomError", "Unauthorized move attempt.");
+            return;
+        }
+
+        if (room.placedPieces[player] < 3) {
+            if (!room.pieces[pos]) {
+                room.pieces[pos] = player;
+                room.placedPieces[player] += 1;
+            }
+        } else {
+            if (selectedPiece && room.pieces[selectedPiece] === player && !room.pieces[pos]) {
+                room.pieces[pos] = player;
+                delete room.pieces[selectedPiece];
+            }
+        }
+
+        const winner = checkWinner(room.pieces);
+        if (winner) room.winner = winner;
+
+        room.currentPlayer = room.currentPlayer === "X" ? "O" : "X";
+
+        io.to(roomId).emit("gameState", {
+            roomId,
+            pieces: room.pieces,
+            currentPlayer: room.currentPlayer,
+            winner: room.winner,
+            placedPieces: room.placedPieces,
+            gameStarted: room.gameStarted
+        });
+
+        console.log(`Move made by ${userId} in room ${roomId}:`, room.pieces);
+    });
+
     socket.on("disconnect", () => {
-      for (const roomId in rooms) {
-        rooms[roomId].players = rooms[roomId].players.filter(player => player.id !== socket.id);
-        if (rooms[roomId].players.length === 0) {
-          delete rooms[roomId]; 
+        console.log("A user disconnected:", socket.id);
+        for (const roomId in rooms) {
+            const room = rooms[roomId];
+            for (const userId in room.players) {
+                if (room.players[userId].socketId === socket.id) {
+                    console.log(`Player ${userId} disconnected from room ${roomId}`);
+                    // Optionally reset game if a player leaves before it ends
+                    if (room.gameStarted && !room.winner) {
+                        room.gameStarted = false;
+                        io.to(roomId).emit("gameState", { ...room, gameStarted: false });
+                        io.to(roomId).emit("roomError", "Opponent disconnected. Game paused.");
+                    }
+                }
+            }
+            if (Object.keys(room.players).length === 0) {
+                delete rooms[roomId];
+            }
         }
-      }
-      console.log("A user disconnected:", socket.id);
     });
-  });
-  
-  function checkWinner(pieces) {
+});
+
+function checkWinner(pieces) {
     const winningPatterns = [
-      ["A", "B", "C"], ["D", "E", "F"], ["G", "H", "I"], // Rows
-      ["A", "D", "G"], ["B", "E", "H"], ["C", "F", "I"], // Columns
-      ["A", "E", "I"], ["C", "E", "G"] // Diagonals
+        ["A", "B", "C"], ["D", "E", "F"], ["G", "H", "I"],
+        ["A", "D", "G"], ["B", "E", "H"], ["C", "F", "I"],
+        ["A", "E", "I"], ["C", "E", "G"]
     ];
-  
+
     for (let pattern of winningPatterns) {
-      const [a, b, c] = pattern;
-      if (pieces[a] && pieces[a] === pieces[b] && pieces[a] === pieces[c]) {
-        return pieces[a];
-      }
+        const [a, b, c] = pattern;
+        if (pieces[a] && pieces[a] === pieces[b] && pieces[a] === pieces[c]) {
+            return pieces[a];
+        }
     }
     return null;
-  }
+}
+
 server.listen(5000, () => console.log("Server running on port 5000"));

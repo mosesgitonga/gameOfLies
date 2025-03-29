@@ -6,7 +6,7 @@ class AuthMiddlewares {
      * @param {Helper} helpers  - contains methods to perfom minor tasks
      * @param {Engine} engine - methods for crud operations
      */
-    constructor() {
+    constructor(helpers, engine) {
         this.helpers = helpers
         this.engine = engine
     }
@@ -19,7 +19,7 @@ class AuthMiddlewares {
          * @param {function} next - Calls the next middleware.
          * @returns {void}
          */
-        const authheader = req.header.authorization
+        const authheader = req.headers.authorization
         if (!authheader || !authheader.startsWith('Bearer ')) {
             return res.status(401).json({"message": "Token not found or Invalid access token"})
         }
@@ -40,12 +40,15 @@ class AuthMiddlewares {
         } catch (error) {
             if (error.name = 'TokenExpiredError') {
                 console.error("Token is expired.")
-                return res.status(500).json({"message": "Expired Access Token"})
+                return res.status(401).json({"message": "Expired Access Token"})
             } else if (error.name = 'JsonWebTokenError') {
                 console.error('invalid access token')
-                return res.status(500).json({"message": "Invalid Access Token"})
+                return res.status(401).json({"message": "Invalid Access Token"})
             }
+            console.error(error)
             return res.status(500).json({"error": "Internal Server Error"})
         }
     }   
 }
+
+export default AuthMiddlewares;

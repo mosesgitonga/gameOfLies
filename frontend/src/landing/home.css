@@ -1,135 +1,344 @@
+/* Main Container */
 .homeContainer {
-    max-width: 100vw;
-    height:fit-content;
-    margin: auto;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #121212;
+    overflow-x: hidden;
 }
 
-
+/* Header */
 header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: radial-gradient(circle, #af9c9c, #222);
-    color: #32caca;
-    padding: 10px;
+    background: radial-gradient(circle, #333, #111);
+    color: #ecf1f1;
+    z-index: 1000;
+    padding: 0 15px;
+    box-shadow: 0 2px 4px rgba(143, 151, 151, 0.2);
 }
 
+/* Heading */
+#heading {
+    margin: 0;
+    font-size: 1.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 40%;
+}
+
+/* Hamburger Menu */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 10px;
+    z-index: 1001;
+}
+
+.hamburger span {
+    width: 25px;
+    height: 3px;
+    background: #ecf1f1;
+    transition: all 0.3s ease;
+}
+
+.hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
+}
+
+/* Navigation */
 nav ul {
-    list-style: none;
     display: flex;
     gap: 15px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    align-items: center;
+    flex-wrap: nowrap;
+    max-width: 50%;
+}
+
+nav ul li {
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 5px 10px;
+    white-space: nowrap;
 }
 
 .profile-icon {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     cursor: pointer;
+    transition: transform 0.2s;
 }
 
+.profile-icon:hover {
+    transform: scale(1.1);
+}
+
+/* Sidebar Navigation */
 .menuSection {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
-    width: 200px;
+    position: fixed;
+    left: 0;
+    top: 60px;
+    height: calc(100vh - 60px);
+    width: 250px;
+    background: #222;
+    border-right: 1px solid #8f9797;
+    padding: 20px 10px;
+    transition: transform 0.3s ease-in-out;
+    z-index: 999;
 }
 
+/* Menu List */
 .menuList {
-    flex-direction: column;
-    height: 100%;
     width: 100%;
     list-style: none;
     padding: 0;
     margin: 0;
     display: flex;
-    gap: 20px;
-    background-color: #333;
-    padding: 10px 20px;
-    border-radius: 8px;
-    border: 1px solid #32caca;
-
-    box-shadow: 0 4px 6px rgba(245, 228, 228, 0.1);
+    flex-direction: column;
+    gap: 10px;
 }
 
 .menuItem {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #32caca;
-    padding: 8px 12px;
-    border-radius: 5px;
-    border: 1px solid #000;
-
-    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+    width: 100%;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #8f9797;
+    padding: 12px 20px;
+    border-radius: 8px;
     cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
 }
 
 .menuItem:hover {
     background: #333;
-    color: white;
-    transform: translateY(-2px);
+    color: #fff;
+    transform: translateX(5px);
+}
+
+/* Dropdown */
+.dropdown {
+    position: fixed;
+    left: 250px;
+    background: #1a1a1a;
+    color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    width: min(450px, 90vw);
+    z-index: 998;
+}
+
+.menuItem:hover .dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Dropdown Content */
+.dropdown p {
+    margin: 8px 0;
+    padding: 5px;
+    font-size: 0.95rem;
+}
+
+.dropdown aside {
+    margin-bottom: 15px;
+}
+
+.dropdown h3 {
+    margin: 0 0 10px;
+    font-size: 1.2rem;
+    color: #fff;
+    border-bottom: 1px solid #8f9797;
+    padding-bottom: 5px;
+}
+
+/* Main Content */
+.contentContainer {
+    margin-left: 250px;
+    margin-top: 60px;
+    padding: 20px;
+    flex: 1;
+    transition: margin-left 0.3s ease-in-out;
 }
 
 .details {
-    margin-top: 30px;
-    border: 0.01px solid #32caca;
-    border-radius: 5px;
-    height:fit-content;
-    padding: 30px;
-    width:fit-content;
-    background-color: #333;
-
-
+    background: #222;
+    border-radius: 8px;
+    padding: 20px;
+    color: #8f9797;
+    min-height: calc(100vh - 100px);
+    width: calc(100vh - 1px);
 }
 
+/* Game List */
 .gameList {
     list-style: none;
     padding: 0;
     margin: 20px 0;
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 15px;
-    justify-content: center;
+    max-height: 70vh;
+    overflow-y: auto;
 }
 
 .gameItem {
-    color: white;
-    padding: 1px 5px;
-    border: 1px solid #000;
-
-    /* border-radius: 50px; */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background: #333;
+    padding: 15px;
+    border-radius: 8px;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    width: 50vw;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    align-items: center;
+    transition: all 0.3s ease;
 }
 
 .gameItem:hover {
     transform: translateY(-3px);
-    box-shadow: 4px 6px 10px rgba(255, 254, 254, 0.15);
+    background: #3a3a3a;
 }
 
 .gameItem span {
+    color: #d1c6c6;
     font-size: 1rem;
-    font-weight: 600;
-    color: #32caca;
 }
 
 .gameItem button {
-    background: #32caca;
-    color: rgb(255, 252, 252);
+    background: #8f9797;
+    color: #000;
     border: none;
-    padding: 8px 14px;
+    padding: 8px 15px;
     border-radius: 6px;
     cursor: pointer;
-    font-weight: bold;
-    transition: background 0.3s ease-in-out;
+    transition: all 0.3s ease;
 }
 
 .gameItem button:hover {
-    background: #000000;
-    box-shadow: 0px 0px 1000px 120px #fff;
+    background: #fff;
+    transform: translateY(-1px);
+}
+
+/* My Games */
+.my-game {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin: 5px 0;
+    background: #222;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+}
+
+.my-game:hover {
+    background: #2a2a2a;
+}
+
+.my-game button {
+    background: #007bff;
+    margin-left: 10px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hamburger {
+        display: flex;
+    }
+
+    header {
+        padding: 0 10px;
+    }
+
+    #heading {
+        font-size: 1.2rem;
+        max-width: 60%;
+    }
+
+    nav ul {
+        gap: 10px;
+        max-width: 40%;
+    }
+
+    .menuSection {
+        transform: translateX(-100%);
+    }
+    
+    .menuSection.active {
+        transform: translateX(0);
+    }
+    
+    .contentContainer {
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    .dropdown {
+        left: 0;
+        width: 100%;
+        top: 10px;
+        position: fixed;
+        max-height: calc(100vh - 60px);
+        overflow-y: auto;
+        background-color: #000;
+        z-index: 1000;
+    }
+    
+    .gameList {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    #heading {
+        font-size: 1rem;
+        max-width: 50%;
+    }
+
+    nav ul {
+        gap: 8px;
+        max-width: 35%;
+    }
+
+    nav ul li {
+        font-size: 0.9rem;
+        padding: 5px;
+    }
+
+    .profile-icon {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .dropdown {
+        padding: 10px;
+    }
 }

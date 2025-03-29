@@ -32,6 +32,33 @@ class User {
             return { "error": "Unable to create role" };
         }
     }
+
+    async getUserProfile(req, res) {
+        const userId = req.userId
+        if (!userId) {
+            console.error("no user id found in the request")
+            return res.status(401).json({"message": "Unauthorized: No user found"})
+        }
+
+        try {
+            const user = await this.engine.get("User", "id", userId)
+            if (!user) {
+                console.error("User not found")
+                return res.status(404).json({"message": "User not found"})
+            }
+            const secureUserData = { // removes the password, email from the original user object
+                id: user.id,
+                username: user.username,
+                created_at:  user.created_at,
+                role_id: user.role_id
+            }
+            res.status(200).json({user: secureUserData})
+        } catch (error) {
+            console.error(error)
+            return res.status(500).json({"message": "Internal Server Error"})
+        }
+
+    }
 }
 
 export default User;

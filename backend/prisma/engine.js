@@ -25,26 +25,23 @@ class Engine {
         }
     }
     
-    async getWhere(className, filters = {}) {
-        /**
-         * Fetches multiple records from a Prisma table where conditions match.
-         * @param {string} className - The Prisma model name
-         * @param {Object} filters - Dictionary of filter conditions { field: value }
-         * @returns {Array} - Array of matching records
-         */
-        if (!className || Object.keys(filters).length === 0) {
+    async getWhere(className, filters = {}, orConditions = []) {
+        if (!className || (Object.keys(filters).length === 0 && orConditions.length === 0)) {
             throw new Error("Model name and at least one filter condition are required.");
         }
-
+    
         try {
             if (!this.prisma[className]) {
                 throw new Error(`Table ${className} does not exist`);
             }
-
+    
             const results = await this.prisma[className].findMany({
-                where: filters
+                where: {
+                    ...filters,
+                    OR: orConditions.length ? orConditions : undefined
+                }
             });
-
+    
             return results;
         } catch (error) {
             console.error("Database Error:", error);

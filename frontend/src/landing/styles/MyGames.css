@@ -1,0 +1,121 @@
+:root {
+    --primary-bg: #121212;
+    --secondary-bg: #222;
+    --tertiary-bg: #333;
+    --text-primary: #ecf1f1;
+    --text-secondary: #8f9797;
+    --x-color: rgb(255, 3, 255);
+    --o-color: rgb(115, 255, 0);
+    --error-color: #ff4444;
+    --transition-timing: 0.3s ease;
+    --board-border: rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Main Container */
+  .my-games-container {
+    width: 100vw;
+    min-height: 100vh;
+    background: var(--primary-bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: clamp(1rem, 2vw, 2rem);
+    color: var(--text-primary);
+    margin: 0 auto;
+    flex-wrap: wrap;
+  }
+  
+  /* Heading */
+  .my-games-container h1 {
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    margin: clamp(1rem, 3vw, 1.5rem) 0;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Games List */
+  .my-games-list {
+    list-style: none;
+    padding: 0;
+    margin: clamp(1rem, 2vw, 1.5rem) 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: clamp(0.75rem, 2vw, 1rem);
+    width: min(90%, 800px);
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  
+  .my-game-item {
+    background: var(--secondary-bg);
+    padding: clamp(0.75rem, 2vw, 1rem);
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all var(--transition-timing);
+  }
+  
+  .my-game-item:hover {
+    background: var(--tertiary-bg);
+    transform: translateY(-3px);
+  }
+  
+  .my-game-item span {
+    color: var(--text-secondary);
+    font-size: clamp(0.9rem, 2vw, 1rem);
+  }
+  
+  /* Buttons */
+  .my-game-item button,
+  .my-games-container button {
+    background: var(--text-secondary);
+    color: var(--primary-bg);
+    border: none;
+    padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(1rem, 2vw, 1.5rem);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all var(--transition-timing);
+    font-weight: 600;
+    margin-left: clamp(0.5rem, 1vw, 0.75rem);
+  }
+  
+  .my-game-item button:hover,
+  .my-games-container button:hover {
+    background: #fff;
+    transform: scale(1.05);
+  }
+  
+  /* No Games Message */
+  .my-games-container p {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: clamp(1rem, 2.5vw, 1.1rem);
+    margin: clamp(1rem, 2vw, 1.5rem) 0;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .my-games-container {
+      padding: clamp(0.75rem, 1.5vw, 1rem);
+    }
+  
+    .my-games-list {
+      grid-template-columns: 1fr;
+      width: 90%;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .my-game-item {
+      flex-direction: column;
+      gap: 0.5rem;
+      text-align: center;
+    }
+  
+    .my-game-item button {
+      width: 100%;
+      margin-left: 0;
+      margin-top: 0.5rem;
+    }
+  }

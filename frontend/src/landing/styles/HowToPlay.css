@@ -1,0 +1,113 @@
+:root {
+    --primary-bg: #121212;
+    --secondary-bg: #222;
+    --tertiary-bg: #333;
+    --text-primary: #ecf1f1;
+    --text-secondary: #8f9797;
+    --x-color: rgb(255, 3, 255);
+    --o-color: rgb(115, 255, 0);
+    --error-color: #ff4444;
+    --transition-timing: 0.3s ease;
+    --board-border: rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Main Container */
+  .how-to-play-container {
+    width: 100%;
+    min-height: 100vh;
+    background: var(--primary-bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: clamp(1rem, 2vw, 2rem);
+    color: var(--text-primary);
+
+  }
+
+  .container {
+    display:  flex;
+    justify-content: space-between;
+  }
+  
+  /* Heading */
+  .how-to-play-container h1 {
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    margin: clamp(1rem, 3vw, 1.5rem) 0;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Sections */
+  .how-to-play-container section {
+    background: var(--secondary-bg);
+    padding: clamp(1rem, 2vw, 1.5rem);
+    border-radius: 8px;
+    width: min(90%, 800px);
+    margin-bottom: clamp(1rem, 2vw, 1.5rem);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Subheadings */
+  .how-to-play-container h2 {
+    font-size: clamp(1.25rem, 4vw, 1.75rem);
+    margin-bottom: clamp(0.75rem, 2vw, 1rem);
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--text-secondary);
+    padding-bottom: 0.5rem;
+  }
+  
+  /* Paragraphs and Lists */
+  .how-to-play-container p {
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    color: var(--text-secondary);
+    margin: clamp(0.5rem, 1vw, 0.75rem) 0;
+    line-height: 1.6;
+  }
+  
+  .how-to-play-container ul {
+    list-style: none;
+    padding: 0;
+    margin: clamp(0.5rem, 1vw, 0.75rem) 0;
+  }
+  
+  .how-to-play-container li {
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    color: var(--text-secondary);
+    margin: 0.5rem 0;
+    position: relative;
+    padding-left: 1.5rem;
+  }
+  
+  .how-to-play-container li:before {
+    content: "•";
+    color: var(--x-color);
+    position: absolute;
+    left: 0.5rem;
+  }
+  
+  /* Strong Text */
+  .how-to-play-container strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .how-to-play-container {
+      padding: clamp(0.75rem, 1.5vw, 1rem);
+    }
+  
+    .how-to-play-container section {
+      width: 90%;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .how-to-play-container li {
+      padding-left: 1rem;
+    }
+  
+    .how-to-play-container li:before {
+      left: 0.25rem;
+    }
+  }
