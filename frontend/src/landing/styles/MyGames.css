@@ -1,121 +1,232 @@
-:root {
-    --primary-bg: #121212;
-    --secondary-bg: #222;
-    --tertiary-bg: #333;
-    --text-primary: #ecf1f1;
-    --text-secondary: #8f9797;
-    --x-color: rgb(255, 3, 255);
-    --o-color: rgb(115, 255, 0);
-    --error-color: #ff4444;
-    --transition-timing: 0.3s ease;
-    --board-border: rgba(255, 255, 255, 0.1);
-  }
-  
-  /* Main Container */
-  .my-games-container {
-    width: 100vw;
-    min-height: 100vh;
-    background: var(--primary-bg);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: clamp(1rem, 2vw, 2rem);
-    color: var(--text-primary);
-    margin: 0 auto;
-    flex-wrap: wrap;
-  }
-  
-  /* Heading */
-  .my-games-container h1 {
-    font-size: clamp(1.75rem, 5vw, 2.5rem);
-    margin: clamp(1rem, 3vw, 1.5rem) 0;
-    text-align: center;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  }
-  
-  /* Games List */
+/* Main Container */
+.my-games-container {
+  min-height: 100vh;
+  background: #121212;
+  color: #ecf1f1;
+  padding: clamp(15px, 3vw, 20px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 95vw;
+}
+
+.my-games-container h1 {
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Loading and No Games */
+.my-games-container p {
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  text-align: center;
+  color: #8f9797;
+}
+
+.no-games {
+  position: relative;
+  text-align: center;
+}
+
+.my-games-container button {
+  background: #1a1b1d;
+  color: #fff;
+  border: none;
+  padding: clamp(8px, 2vw, 12px) clamp(15px, 3vw, 20px);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.my-games-container button:hover {
+  background: #afb2b4;
+  color: #111;
+  transform: translateY(-2px);
+}
+
+.my-games-container button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+/* Create Game Dropdown */
+.create-game-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a1a;
+  color: #fff;
+  padding: clamp(10px, 2vw, 15px);
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  width: min(400px, 90vw);
+  z-index: 1000;
+  margin-top: 10px;
+}
+
+.create-game-dropdown h3 {
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  margin: 0 0 10px;
+  border-bottom: 1px solid #8f9797;
+  padding-bottom: 5px;
+}
+
+.create-game-dropdown p {
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  margin: 8px 0;
+}
+
+.share-link {
+  color: #007bff;
+  word-break: break-all;
+}
+
+.dropdown-buttons {
+  display: flex;
+  gap: clamp(5px, 1vw, 10px);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.create-game-dropdown button {
+  padding: clamp(6px, 1.5vw, 8px) clamp(10px, 2vw, 15px);
+}
+
+.create-game-dropdown button:first-child {
+  background: #8f9797; /* Copy Link */
+}
+
+.create-game-dropdown button:first-child:hover {
+  background: #6c757d;
+}
+
+/* My Games List */
+.my-games-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+  display: block; /* Block layout */
+  width: 100%;
+  max-width: 800px;
+}
+
+.my-game-item {
+  background: #333;
+  padding: clamp(10px, 2vw, 15px);
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+  margin-bottom: 10px;
+}
+
+.my-game-item:hover {
+  background: #3a3a3a;
+  transform: translateY(-3px);
+}
+
+.my-game-item span {
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  color: #d1c6c6;
+}
+
+.button-group {
+  display: flex;
+  gap: clamp(5px, 1vw, 10px);
+}
+
+.invite-button {
+  background: #ffc107; /* Yellow for Invite */
+  color: #000;
+  border: none;
+  padding: clamp(6px, 1.5vw, 8px) clamp(10px, 2vw, 15px);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.invite-button:hover {
+  background: #e0a800;
+  transform: translateY(-1px);
+}
+
+.go-to-game-button {
+  background: #28a745; /* Green for Go to Game Room */
+  color: #fff;
+  border: none;
+  padding: clamp(6px, 1.5vw, 8px) clamp(10px, 2vw, 15px);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.go-to-game-button:hover {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
   .my-games-list {
-    list-style: none;
-    padding: 0;
-    margin: clamp(1rem, 2vw, 1.5rem) 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: clamp(0.75rem, 2vw, 1rem);
-    width: min(90%, 800px);
-    max-height: 70vh;
-    overflow-y: auto;
+      max-width: 600px;
   }
-  
+
+  .create-game-dropdown {
+      width: min(350px, 85vw);
+  }
+}
+
+@media (max-width: 768px) {
   .my-game-item {
-    background: var(--secondary-bg);
-    padding: clamp(0.75rem, 2vw, 1rem);
-    border-radius: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: all var(--transition-timing);
-  }
-  
-  .my-game-item:hover {
-    background: var(--tertiary-bg);
-    transform: translateY(-3px);
-  }
-  
-  .my-game-item span {
-    color: var(--text-secondary);
-    font-size: clamp(0.9rem, 2vw, 1rem);
-  }
-  
-  /* Buttons */
-  .my-game-item button,
-  .my-games-container button {
-    background: var(--text-secondary);
-    color: var(--primary-bg);
-    border: none;
-    padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(1rem, 2vw, 1.5rem);
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all var(--transition-timing);
-    font-weight: 600;
-    margin-left: clamp(0.5rem, 1vw, 0.75rem);
-  }
-  
-  .my-game-item button:hover,
-  .my-games-container button:hover {
-    background: #fff;
-    transform: scale(1.05);
-  }
-  
-  /* No Games Message */
-  .my-games-container p {
-    text-align: center;
-    color: var(--text-secondary);
-    font-size: clamp(1rem, 2.5vw, 1.1rem);
-    margin: clamp(1rem, 2vw, 1.5rem) 0;
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .my-games-container {
-      padding: clamp(0.75rem, 1.5vw, 1rem);
-    }
-  
-    .my-games-list {
-      grid-template-columns: 1fr;
-      width: 90%;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .my-game-item {
       flex-direction: column;
-      gap: 0.5rem;
-      text-align: center;
-    }
-  
-    .my-game-item button {
-      width: 100%;
-      margin-left: 0;
-      margin-top: 0.5rem;
-    }
+      align-items: flex-start;
+      gap: 10px;
   }
+
+  .button-group {
+      width: 100%;
+      flex-direction: column;
+  }
+
+  .invite-button,
+  .go-to-game-button {
+      width: 100%;
+  }
+
+  .create-game-dropdown {
+      position: static;
+      transform: none;
+      width: 100%;
+      margin-top: 15px;
+  }
+
+  .dropdown-buttons {
+      flex-direction: column;
+      gap: 8px;
+  }
+
+  .create-game-dropdown button {
+      width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .my-games-container {
+      padding: 10px;
+  }
+
+  .my-games-container h1 {
+      font-size: clamp(1.2rem, 4vw, 1.5rem);
+  }
+
+  .my-game-item {
+      padding: 10px;
+  }
+
+  .create-game-dropdown p {
+      font-size: clamp(0.8rem, 2vw, 0.9rem);
+  }
+}

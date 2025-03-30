@@ -30,17 +30,24 @@ model User {
 }
 
 model Game {
-  id         String   @id @default(uuid())
-  player1    User?     @relation("Player1", fields: [player1Id], references: [id])
-  player1Id  String?
-  player2    User?   @relation("Player2", fields: [player2Id], references: [id])
-  player2Id  String?
-  winner     User?    @relation("Winner", fields: [winnerId], references: [id])
-  winnerId   String?
-  status     String   @default("pending") // pending, ongoing, finished
-  created_at DateTime @default(now())
-  Move       Move[]
+  id             String   @id @default(uuid())
+  player1        User?     @relation("Player1", fields: [player1Id], references: [id])
+  player1Id      String?
+  player1Symbol  String?   // "X" or "O"
+  
+  player2        User?     @relation("Player2", fields: [player2Id], references: [id])
+  player2Id      String?
+  player2Symbol  String?   // "X" or "O"
+
+  winner         User?    @relation("Winner", fields: [winnerId], references: [id])
+  winnerId       String?
+
+  status         String   @default("pending") // pending, ongoing, finished
+  created_at     DateTime @default(now())
+
+  Move           Move[]
 }
+
 
 model Move {
   id         String   @id @default(uuid())

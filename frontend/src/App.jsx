@@ -9,17 +9,15 @@ import HowToPlay from "./landing/HowToPlay";
 
 const App = () => {
   return (
-    <div className="app-container">
       <Routes>
-      <Route path="/my-games" element={<MyGames />} />
-      <Route path="/how-to-play" element={<HowToPlay />} />
+        <Route path="/my-games" element={<MyGames />} />
+        <Route path="/how-to-play" element={<HowToPlay />} />
 
         <Route path="/game/:id" element={<GameBoard />} />
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
 
       </Routes>
-    </div>
   );
 };
 

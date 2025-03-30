@@ -88,7 +88,7 @@ function GameBoard({ roomId: propRoomId }) {
 
         socket.on("roomError", (message) => {
             setError(message);
-            if (message === "Opponent disconnected. Game paused.") {
+            if (message === "") {
                 setGameReady(false);
             }
         });
@@ -172,8 +172,7 @@ function GameBoard({ roomId: propRoomId }) {
                         <h2 className={`gameboard-player-turn ${currentPlayer}`}>
                             {winner ? `Player ${winner} Wins!` : gameReady ? `Player ${currentPlayer}'s Turn` : "Waiting for opponent..."}
                         </h2>
-                        <h3>Your Symbol: {playerSymbol || "Not assigned yet"}</h3>
-                        <h4>Room ID: {roomId}</h4>
+                        {playerSymbol === "X" ? <h3 style={{ color: "rgba(255, 0, 200, 0.8)" }}>Your Symbol: {playerSymbol || "Not assigned yet"}</h3> : <h3 style={{ color: "rgba(115, 255, 0, 0.8)" }}>Your Symbol: {playerSymbol || "Not assigned yet"}</h3> }
                         {error && <p className="gameboard-error-message">{error}</p>}
                         {!gameReady && !winner && <p style={{ color: "red" }}>Waiting for the second player to join...</p>
 }

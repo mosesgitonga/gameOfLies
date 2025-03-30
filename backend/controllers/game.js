@@ -24,10 +24,19 @@ class Game {
          * @returns {Json} returns a json response 
          */
         try {
-            const { userId } = req.body
+            const { player1Id } = req.body
+            if (!player1Id)  {
+                console.error('No user id on req.body')
+                return res.status(403).json({"message": "cannot create game without user id"})
+            }
+            const userId = player1Id
             const id = this.helper.generateUuid()
             const existingPlayerGame = this.engine.getWhere("Game", { player1Id: userId, status: "pending" })
-            if (existingPlayerGame) {
+            // const existingPlayerGame = await this.engine.getWhere("Game", {}, [
+            //     { player1Id: userId },
+            //     // { status: "pending" }
+            // ]);
+            if (existingPlayerGame == []) {
                 return res.status(409).json({ "message": "You have a Pending game, \nIf you must continue == Destroy it first" })
             }
             const data = {
@@ -92,48 +101,60 @@ class Game {
 
     async getPendingGames(req, res) {
         try {
-            const games = await this.engine.getWhere("Game", { status: "pending" });
-
+            // Fetch all pending games
+            const games = await this.engine.all("Game", { where: { status: "pending" } });
+    
+            // Map games to include challenger details
             const gameDetails = await Promise.all(
                 games.map(async (game) => {
-                    const challenger = await this.engine.get("User", 'id', game.player1Id);
-
+                    let challengerUsername = "Unknown";
+                    if (game.player1Id) { // Check if player1Id exists
+                        const challenger = await this.engine.get("User", "id", game.player1Id);
+                        challengerUsername = challenger ? challenger.username : "Unknown";
+                    } else {
+                        console.warn(`Game ${game.id} has no player1Id`);
+                    }
+    
                     return {
-                        challenger: challenger.username,
+                        challenger: challengerUsername,
                         id: game.id,
                         status: "pending",
                         created_at: game.created_at
                     };
                 })
             );
-
+    
+            // Return the enriched game details
             return res.status(200).json(gameDetails);
         } catch (error) {
-            console.error(error);
-            return res.status(500).json({ "message": "Internal Server Error" });
+            console.error("Error in getPendingGames:", error);
+            return res.status(500).json({ message: "Internal Server Error" });
         }
     }
-
     async getUserGames(req, res) {
-        console.log(req.params)
-        const { userId } = req.params
-        console.log(userId)
+        const { userId } = req.params;
         if (!userId) {
-            console.error("No user id found in the query params")
-            return res.status(404).json({ "message": "user id not  found" })
+            console.error("No user id found in the query params");
+            return res.status(400).json({ message: "User ID is required" }); // 400 for bad request
         }
-
+    
         try {
-            const games = await this.engine.getWhere("Game", {
-                OR: [{ player1Id: userId }, { player2Id: userId }]
-            });
-            if (!games) {
-                console.error("no games found")
-                return res.status(404).json({ "message": "No games found" })
+            const games = await this.engine.getWhere("Game", {}, [
+                { player1Id: userId },
+                { player2Id: userId }
+            ]);
+    
+            if (!Array.isArray(games) || games.length === 0) {
+                console.log(`No games found for userId: ${userId}`);
+                return res.status(404).json({ message: "No games found" });
             }
+    
             const result = await Promise.all(
                 games.map(async (game) => {
                     const challenger = await this.engine.get("User", "id", game.player1Id);
+                    if (!challenger) {
+                        throw new Error(`User not found for player1Id: ${game.player1Id}`);
+                    }
                     return {
                         challenger: challenger.username,
                         gameId: game.id,
@@ -141,17 +162,14 @@ class Game {
                     };
                 })
             );
-
-
-
-            return res.status(200).json(result)
-
+    
+            console.log(`Games found for userId: ${userId}`, result);
+            return res.status(200).json(result);
         } catch (error) {
-            console.error(error)
-            return res.status(500).json({ "error": "Internal Server Error" })
+            console.error("Error fetching user games:", error);
+            return res.status(500).json({ message: "Internal Server Error" });
         }
     }
-
 }
 
 export default Game

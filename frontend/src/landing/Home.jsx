@@ -8,9 +8,23 @@ const Home = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const { isAuthenticated, user } = useContext(AuthContext);
     const [openDropdown, setOpenDropdown] = useState(null);
+    const [createdGame, setCreatedGame] = useState(null);
     const navigate = useNavigate();
 
-    // Toggle dropdown for remaining items (Game History, Wallet)
+    useEffect(() => {
+        const fetchGames = async () => {
+            try {
+                const response = await fetch("http://localhost:5000/api/games");
+                const data = await response.json();
+                setGames(Array.isArray(data) ? data : []);
+            } catch (error) {
+                console.error("Error fetching games:", error);
+                setGames([]);
+            }
+        };
+        fetchGames();
+    }, []); // Empty dependency array to run only on mount
+
     const handleToggle = (menu) => {
         setOpenDropdown(openDropdown === menu ? null : menu);
         if (window.innerWidth <= 768) {
@@ -20,25 +34,49 @@ const Home = () => {
 
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);
+        setOpenDropdown(null);
     };
 
-    useEffect(() => {
-        const fetchGames = async () => {
-            try {
-                const response = await fetch("http://localhost:5000/api/games");
-                const data = await response.json();
-                setGames(data);
-            } catch (error) {
-                console.error("Error fetching games:", error);
+    const createGame = async () => {
+        if (!isAuthenticated) {
+            alert("Please log in to create a game.");
+            navigate("/login");
+            return;
+        }
+
+        try {
+            const response = await fetch("http://localhost:5000/api/games", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    // Add auth token if required, e.g., "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+                },
+                body: JSON.stringify({ player1Id: user.id }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to create game");
             }
-        };
-        fetchGames();
-    }, []);
+
+            const newGame = await response.json();
+            setCreatedGame(newGame);
+            setOpenDropdown("create-game");
+        } catch (error) {
+            console.error("Error creating game:", error);
+            alert("Failed to create game. Please try again.");
+        }
+    };
+
+    const copyShareLink = () => {
+        const shareLink = `${window.location.origin}/game/${createdGame.gameId}`;
+        navigator.clipboard.writeText(shareLink);
+        alert("Game link copied to clipboard!");
+    };
 
     return (
         <div className="homeContainer">
             <header>
-                <div className={`hamburger ${menuOpen ? 'active' : ''}`} onClick={toggleMenu}>
+                <div className={`hamburger ${menuOpen ? "active" : ""}`} onClick={toggleMenu}>
                     <span></span>
                     <span></span>
                     <span></span>
@@ -46,7 +84,7 @@ const Home = () => {
                 <h1 id="heading">Game of Lies</h1>
                 <nav>
                     <ul className="nav-list">
-                        <li>About</li>
+                        <li onClick={() => navigate("/about")}>About</li>
                         {isAuthenticated ? (
                             <li>
                                 <img
@@ -67,16 +105,14 @@ const Home = () => {
             </header>
 
             <main className="container">
-                <div className={`menuSection ${menuOpen ? 'active' : ''}`}>
+                <div className={`menuSection ${menuOpen ? "active" : ""}`}>
                     <ul className="menuList">
                         <li className="menuItem" onClick={() => navigate("/my-games")}>
                             My Games
                         </li>
-
                         <li className="menuItem" onClick={() => navigate("/how-to-play")}>
                             How to Play
                         </li>
-
                         <li className="menuItem" onClick={() => handleToggle("game-history")}>
                             Game History
                             {openDropdown === "game-history" && (
@@ -85,12 +121,32 @@ const Home = () => {
                                 </div>
                             )}
                         </li>
-
                         <li className="menuItem" onClick={() => handleToggle("wallet")}>
                             Wallet
                             {openDropdown === "wallet" && (
                                 <div className="dropdown">
-                                    <p>Soon you will be able to place bets.</p>
+                                    <p>Coming Soon: You will place bets with your opponent.</p>
+                                </div>
+                            )}
+                        </li>
+                        <li className="menuItem" onClick={createGame}>
+                            Create Game
+                            {openDropdown === "create-game" && createdGame && (
+                                <div className="dropdown">
+                                    <h3>Game Created!</h3>
+                                    <p>
+                                        Share this link to invite a player:{" "}
+                                        <span className="share-link">
+                                            {`${window.location.origin}/game/${createdGame.gameId}`}
+                                        </span>
+                                    </p>
+                                    <button onClick={copyShareLink}>Copy Link</button>
+                                    <button
+                                        onClick={() => navigate(`/game/${createdGame.gameId}`)}
+                                        style={{ marginLeft: "10px", background: "#007bff" }}
+                                    >
+                                        Go to Game Room
+                                    </button>
                                 </div>
                             )}
                         </li>
@@ -104,17 +160,16 @@ const Home = () => {
                             <ul className="gameList">
                                 {games.map((game) => (
                                     <li key={game.id} className="gameItem">
-                                        <span>Challenger = {game.challenger}</span>
-                                        <span>Status = {game.status}</span>
-                                        <button>Join</button>
+                                        <span>Challenger: {game.challenger}</span>
+                                        <span>Status: {game.status}</span>
+                                        <button onClick={() => navigate(`/game/${game.id}`)}>Join</button>
                                     </li>
                                 ))}
                             </ul>
                         ) : (
                             <p>
                                 No available games at the moment. <br />
-                                Create a new Game:
-                                <button onClick={() => navigate("/create-game")}>Create Game</button>
+                                <button onClick={createGame}>Create Game</button>
                             </p>
                         )}
                     </div>

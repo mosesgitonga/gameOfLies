@@ -9,6 +9,7 @@ const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const token = localStorage.getItem("access_token");
+        console.log("Initializing auth - Token:", token);
 
         if (token) {
             fetch("http://localhost:5000/api/auth/user", {
@@ -32,15 +33,17 @@ const AuthProvider = ({ children }) => {
     }, []);
 
     const login = (token, userData) => {
-        localStorage.setItem("access_token", token); // Consistent key
+        localStorage.setItem("access_token", token);
         setUser(userData);
         setIsAuthenticated(true);
+        console.log("Login - Token:", token, "User set:", userData);
     };
 
     const logout = () => {
         localStorage.removeItem("access_token");
         setUser(null);
         setIsAuthenticated(false);
+        console.log("Logged out");
     };
 
     return (
