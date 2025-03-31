@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { AuthContext } from "./AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -8,6 +8,7 @@ const Login = () => {
 
     const { login } = useContext(AuthContext);
     const navigate = useNavigate();
+    const location = useLocation(); // To access query params
 
     const handleLogin = async (e) => {
         console.log("handle login...");
@@ -21,17 +22,26 @@ const Login = () => {
             });
             const data = await response.json();
 
-            const userResonse  = await fetch("http://localhost:5000/api/auth/user", {
-                headers: { Authorization: `Bearer ${data.access_token}` }
-            })
-            const userData = await userResonse.json()
+            if (!response.ok) {
+                alert(data.message || "Login failed");
+                return;
+            }
 
-            if (response.ok) {
+            const userResponse = await fetch("http://localhost:5000/api/auth/user", {
+                headers: { Authorization: `Bearer ${data.access_token}` },
+            });
+            const userData = await userResponse.json();
+
+            if (userResponse.ok) {
                 console.log("Login response:", userData.user); // Debug response
                 login(data.access_token, userData.user); // Set token and user in context
-                navigate("/"); 
+
+                // Get redirect URL from query params, default to "/"
+                const searchParams = new URLSearchParams(location.search);
+                const redirectUrl = searchParams.get("redirect") || "/";
+                navigate(redirectUrl);
             } else {
-                alert(data.message || "Login failed");
+                alert("Failed to fetch user data");
             }
         } catch (error) {
             console.error("Login error:", error);

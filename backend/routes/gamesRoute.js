@@ -16,5 +16,6 @@ gameRouter.post("/api/game", (req, res) => game.createGame(req, res))
 gameRouter.patch("/api/game/join", (req, res) => game.joinGame(req, res))
 gameRouter.get('/api/games', (req, res) => game.getPendingGames(req, res))
 gameRouter.get('/api/user/games/:userId', (req, res) => game.getUserGames(req, res))
+gameRouter.get('/api/game/:gameId', (req, res) =>  game.getGame(req, res))
 
 export default gameRouter

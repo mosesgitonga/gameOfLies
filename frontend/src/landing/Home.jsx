@@ -43,19 +43,22 @@ const Home = () => {
             navigate("/login");
             return;
         }
+        let error = ""
 
         try {
-            const response = await fetch("http://localhost:5000/api/games", {
+            const response = await fetch("http://localhost:5000/api/game", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    // Add auth token if required, e.g., "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+                    //"Authorization": `Bearer ${localStorage.getItem("access_token")}`
                 },
                 body: JSON.stringify({ player1Id: user.id }),
             });
 
             if (!response.ok) {
-                throw new Error("Failed to create game");
+                error = await response.json()
+
+                throw new Error(error.message);
             }
 
             const newGame = await response.json();
@@ -63,7 +66,7 @@ const Home = () => {
             setOpenDropdown("create-game");
         } catch (error) {
             console.error("Error creating game:", error);
-            alert("Failed to create game. Please try again.");
+            alert(error.message);
         }
     };
 
@@ -126,27 +129,6 @@ const Home = () => {
                             {openDropdown === "wallet" && (
                                 <div className="dropdown">
                                     <p>Coming Soon: You will place bets with your opponent.</p>
-                                </div>
-                            )}
-                        </li>
-                        <li className="menuItem" onClick={createGame}>
-                            Create Game
-                            {openDropdown === "create-game" && createdGame && (
-                                <div className="dropdown">
-                                    <h3>Game Created!</h3>
-                                    <p>
-                                        Share this link to invite a player:{" "}
-                                        <span className="share-link">
-                                            {`${window.location.origin}/game/${createdGame.gameId}`}
-                                        </span>
-                                    </p>
-                                    <button onClick={copyShareLink}>Copy Link</button>
-                                    <button
-                                        onClick={() => navigate(`/game/${createdGame.gameId}`)}
-                                        style={{ marginLeft: "10px", background: "#007bff" }}
-                                    >
-                                        Go to Game Room
-                                    </button>
                                 </div>
                             )}
                         </li>

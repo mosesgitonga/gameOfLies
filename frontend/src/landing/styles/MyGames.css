@@ -16,6 +16,11 @@
   text-align: center;
 }
 
+.my-game-item span {
+  display: flex;
+  justify-content: space-evenly;
+}
+
 /* Loading and No Games */
 .my-games-container p {
   font-size: clamp(1rem, 3vw, 1.2rem);

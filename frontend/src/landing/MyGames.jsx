@@ -31,6 +31,7 @@ const MyGames = () => {
                 const access_token = localStorage.getItem("access_token");
                 console.log("Fetching games - Access token:", access_token);
                 if (!access_token) throw new Error("No access token found");
+                console.log('User -->', user.id)
 
                 const response = await fetch(`http://localhost:5000/api/user/games/${user.id}`, {
                     headers: {
@@ -134,7 +135,8 @@ const MyGames = () => {
                 <ul className="my-games-list">
                     {userGames.map((game) => (
                         <li key={game.gameId} className="my-game-item">
-                            <span>Challenger: {game.challenger} ({game.status})</span>
+                            <span>{game.challenger} VS {game.opponent} </span>
+                            <span>({game.status})</span>
                             <div className="button-group">
                                 <button
                                     onClick={() => copyShareLink(game.gameId)}

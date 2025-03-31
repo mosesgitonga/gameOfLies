@@ -5,6 +5,8 @@
     min-height: 100vh;
     background: #121212;
     overflow-x: hidden;
+    font-family: "orbitron";
+    font-size: 110%;;
 }
 
 /* Header */
@@ -101,7 +103,7 @@ nav ul li {
     top: 60px;
     height: calc(100vh - 60px);
     width: clamp(200px, 25vw, 250px); /* Responsive width */
-    background: #222;
+    background: #1b1b1b;
     border-right: 5px solid #141313;
     padding: 20px 10px;
     transition: transform 0.3s ease-in-out;
@@ -191,10 +193,10 @@ nav ul li {
 }
 
 .details {
-    background: #222;
+    background: radial-gradient(ellipse, #222, #111);
     border-radius: 8px;
     padding: clamp(15px, 3vw, 20px);
-    color: #8f9797;
+    color: #adafaf;
     min-height: calc(100vh - 100px);
     width: calc(100vw - 350px)
 }
@@ -263,7 +265,7 @@ nav ul li {
 }
 
 .my-game button {
-    background: #007bff;
+    background: #404549;
     margin-left: 10px;
     padding: 6px 12px;
     border-radius: 4px;

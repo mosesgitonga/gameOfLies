@@ -176,6 +176,30 @@ class Engine {
             throw new Error("Internal Server Error")
         }
     }
+
+    async getUserActiveGames(userId) {
+        try {
+            const games = await this.prisma.game.findMany({
+                where: {
+                    AND: [
+                        {
+                            OR: [
+                                { player1Id: userId },
+                                { player2Id: userId },
+                            ],
+                        },
+                        {
+                            status: { in: ["pending", "ongoing"] },
+                        },
+                    ],
+                },
+            });
+            return games;
+        } catch (error) {
+            console.error(`Error fetching active games for user ${userId}:`, error);
+            throw error;
+        }
+    }
 }
 
 export default Engine;
