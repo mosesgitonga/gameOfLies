@@ -142,7 +142,7 @@ nav ul li {
 }
 
 /* Dropdown */
-.dropdown {
+/* .dropdown {
     position: fixed;
     left: 250px;
     background: #1a1a1a;
@@ -150,18 +150,47 @@ nav ul li {
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    opacity: 0;
-    visibility: hidden;
+    opacity: 1;
+     visibility: hidden; 
     transform: translateY(10px);
     transition: all 0.3s ease;
     width: min(450px, 90vw);
     z-index: 998;
-}
+} */
 
 .menuItem:hover .dropdown {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+}
+
+.dropdown {
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 10px;
+    position: absolute;
+    z-index: 10;
+}
+
+.create-game {
+    padding: 10px;
+}
+
+.create-game input {
+    padding: 5px;
+    margin-right: 10px;
+}
+
+.create-game button {
+    padding: 5px 10px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.create-game button:hover {
+    background-color: #2980b9;
 }
 
 /* Dropdown Content */

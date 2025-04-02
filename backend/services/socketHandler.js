@@ -21,17 +21,24 @@ function setupSocket(io) {
                 return;
             }
 
+            // Check if user is a player; don’t update DB here
+            const isPlayer = game.player1Id === userId || game.player2Id === userId;
+            if (!isPlayer) {
+                // socket.emit("roomError", "You are not a player in this game yet.");
+                return;
+            }
+
             let gameState;
             try {
                 gameState = game.state ? JSON.parse(game.state) : {
-                    pieces: {},
+                    pieces: { A: null, B: null, C: null, D: null, E: null, F: null, G: null, H: null, I: null },
                     currentPlayer: game.player1Symbol || "X",
                     placedPieces: { X: 0, O: 0 },
                 };
             } catch (error) {
                 console.error(`Invalid JSON in game.state for room ${roomId}:`, game.state, error);
                 gameState = {
-                    pieces: {},
+                    pieces: { A: null, B: null, C: null, D: null, E: null, F: null, G: null, H: null, I: null },
                     currentPlayer: game.player1Symbol || "X",
                     placedPieces: { X: 0, O: 0 },
                 };
@@ -39,7 +46,7 @@ function setupSocket(io) {
                 console.log(`Reset corrupted state for game ${roomId}`);
             }
 
-            if (!rooms[roomId]) {
+            if (!rooms[roomId] || game.status === "pending" || game.status === "finished") {
                 rooms[roomId] = {
                     players: {},
                     pieces: gameState.pieces,
@@ -57,36 +64,28 @@ function setupSocket(io) {
                 return;
             }
 
-            const playerSymbol = userId === game.player1Id ? game.player1Symbol : game.player2Id === userId ? game.player2Symbol : null;
+            const playerSymbol = userId === game.player1Id ? game.player1Symbol : game.player2Symbol;
             let wasDisconnected = false;
-            if (!playerSymbol && userId !== game.player1Id && !game.player2Id) {
-                await engine.update("Game", roomId, {
-                    player2Id: userId,
-                    player2Symbol: "O",
-                    status: "ongoing",
-                });
-                room.players[userId] = { symbol: "O", socketId: socket.id };
-                const updatedGame = await engine.get("Game", "id", roomId);
-                room.gameStarted = updatedGame.status === "ongoing" || updatedGame.status === "inProgress";
-            } else if (playerSymbol) {
-                wasDisconnected = room.players[userId]?.disconnected;
+            if (room.players[userId]) {
+                wasDisconnected = room.players[userId].disconnected;
                 room.players[userId] = { symbol: playerSymbol, socketId: socket.id };
                 delete room.players[userId].disconnected;
             } else {
-                socket.emit("roomError", "Player symbol not assigned.");
-                return;
+                room.players[userId] = { symbol: playerSymbol, socketId: socket.id };
             }
 
-            const symbol = room.players[userId].symbol;
             socket.join(roomId);
-            console.log("Emitting assignSymbol to", userId, "with symbol", symbol);
-            socket.emit("assignSymbol", { userId, symbol });
+            console.log("Emitting assignSymbol to", userId, "with symbol", playerSymbol);
+            socket.emit("assignSymbol", { userId, symbol: playerSymbol });
 
             console.log(`Room ${roomId} status:`, { playerCount: Object.keys(room.players).length, gameStarted: room.gameStarted, dbStatus: game.status });
 
             if (Object.keys(room.players).length === 2 && !room.gameStarted) {
                 room.gameStarted = true;
-                await engine.update("Game", roomId, { status: "inProgress" });
+                // Only update status to "inProgress" if not already set; DB update happens elsewhere
+                if (game.status !== "inProgress") {
+                    await engine.update("Game", roomId, { status: "inProgress" });
+                }
                 io.to(roomId).emit("gameReady", { roomId });
                 console.log(`Game started in room ${roomId} - emitted gameReady`);
                 if (wasDisconnected) {
@@ -104,7 +103,7 @@ function setupSocket(io) {
                 gameStarted: room.gameStarted,
             });
 
-            console.log(`Player ${userId} joined room ${roomId} as ${symbol}`);
+            console.log(`Player ${userId} joined room ${roomId} as ${playerSymbol}`);
         });
 
         socket.on("makeMove", async ({ pos, player, selectedPiece, roomId, userId }) => {

@@ -11,37 +11,34 @@ class Game {
 
     async createGame(req, res) {
         try {
-            const { player1Id } = req.body;
-            if (!player1Id) {
-                console.error("No user ID on req.body");
-                return res.status(403).json({ message: "Cannot create game without user ID" });
+            const { player1Id, betAmount } = req.body;
+            if (!player1Id || !betAmount || betAmount <= 0) {
+                return res.status(400).json({ message: "User ID and valid bet amount are required" });
             }
 
-            // Check for existing ongoing or paused games
+            const user = await this.engine.get("User", "id", player1Id);
+            if (!user || user.balance < betAmount) {
+                return res.status(400).json({ message: "Insufficient balance" });
+            }
+
             const existingActiveGames = await this.engine.getWhere("Game", {
-                OR: [
-                    { player1Id: player1Id },
-                    { player2Id: player1Id },
-                ],
+                OR: [{ player1Id }, { player2Id: player1Id }],
                 status: { in: ["ongoing", "paused"] },
             });
-
             if (existingActiveGames.length > 0) {
                 return res.status(409).json({
-                    message: "You are already in an ongoing or paused game. Finish or abandon it first.",
+                    message: "You are already in an ongoing or paused game.",
                     gameId: existingActiveGames[0].id,
                 });
             }
 
-            // Check for existing pending game (keep this as a separate check if you want)
             const existingPendingGame = await this.engine.getWhere("Game", {
-                player1Id: player1Id,
+                player1Id,
                 status: "pending",
             });
-
             if (existingPendingGame.length > 0) {
                 return res.status(409).json({
-                    message: "You have a pending game. Destroy it first to create a new one.",
+                    message: "You have a pending game. Destroy it first.",
                     gameId: existingPendingGame[0].id,
                 });
             }
@@ -52,15 +49,20 @@ class Game {
                 currentPlayer: "X",
                 placedPieces: { X: 0, O: 0 },
             };
-            const data = {
-                id: id,
-                player1Id: player1Id,
+
+            // Deduct bet amount and create game
+            const game = await this.engine.create("Game", {
+                id,
+                player1Id,
                 player1Symbol: "X",
                 status: "pending",
                 state: JSON.stringify(initialState),
-            };
+                betAmount, // Store fixed bet amount
+            });
+            await this.engine.update("User", player1Id, { balance: user.balance - betAmount });
 
-            const game = await this.engine.create("Game", data);
+            await this.engine.create("Bet", { gameId: id, userId: player1Id, amount: betAmount });
+
             return res.status(201).json({ message: "Game created successfully", gameId: game.id });
         } catch (error) {
             console.error("Error creating game:", error);
@@ -72,23 +74,8 @@ class Game {
         try {
             const { gameId, userId } = req.body;
 
-            if (!userId) return res.status(400).json({ error: "No user ID provided" });
-            if (!gameId) return res.status(400).json({ error: "No game ID provided" });
-
-            // Check for existing ongoing or paused games
-            const existingActiveGames = await this.engine.getWhere("Game", {
-                OR: [
-                    { player1Id: userId },
-                    { player2Id: userId },
-                ],
-                status: { in: ["ongoing", "paused"] },
-            });
-
-            if (existingActiveGames.length > 0) {
-                return res.status(409).json({
-                    message: "You are already in an ongoing or paused game. Finish or abandon it first.",
-                    gameId: existingActiveGames[0].id,
-                });
+            if (!gameId || !userId) {
+                return res.status(400).json({ message: "Game ID and user ID are required" });
             }
 
             const game = await this.engine.get("Game", "id", gameId);
@@ -96,23 +83,37 @@ class Game {
             if (game.player2Id) return res.status(400).json({ message: "Game already has two players" });
             if (game.player1Id === userId) return res.status(400).json({ message: "You cannot join your own game" });
 
-            const data = {
+            const user = await this.engine.get("User", "id", userId);
+            if (user.balance < game.betAmount) {
+                return res.status(400).json({ message: "Insufficient balance to join this game" });
+            }
+
+            const existingActiveGames = await this.engine.getWhere("Game", {
+                OR: [{ player1Id: userId }, { player2Id: userId }],
+                status: { in: ["ongoing", "paused"] },
+            });
+            if (existingActiveGames.length > 0) {
+                return res.status(409).json({
+                    message: "You are already in an ongoing or paused game.",
+                    gameId: existingActiveGames[0].id,
+                });
+            }
+
+            // Deduct bet amount and join game
+            await this.engine.update("User", userId, { balance: user.balance - game.betAmount });
+            await this.engine.create("Bet", { gameId, userId, amount: game.betAmount });
+            await this.engine.update("Game", gameId, {
                 player2Id: userId,
                 player2Symbol: "O",
                 status: "ongoing",
-            };
-
-            await this.engine.update("Game", gameId, data);
+            });
 
             const io = req.app.get("socketio");
             if (io) {
                 io.to(gameId).emit("gameReady", { roomId: gameId });
-                console.log(`Emitted gameReady for game ${gameId}`);
-            } else {
-                console.error("Socket.IO not initialized");
             }
 
-            return res.status(200).json({ message: "Player 2 added to the game", gameId });
+            return res.status(200).json({ message: "Joined game successfully", gameId });
         } catch (error) {
             console.error("Error joining game:", error);
             return res.status(500).json({ message: "Internal Server Error" });
@@ -166,6 +167,7 @@ class Game {
                         id: game.id,
                         status: "pending",
                         created_at: game.created_at,
+                        entryAmount: game.betAmount
                     };
                 })
             );
@@ -260,6 +262,38 @@ class Game {
             return res.status(200).json(responseGame);
         } catch (error) {
             console.error("Error fetching game:", error);
+            return res.status(500).json({ message: "Internal Server Error" });
+        }
+    }
+
+    async placeBet(req, res) {
+        try {
+            const { gameId, userId, amount } = req.body;
+            if (!gameId || !userId || !amount || amount <= 0) {
+                return res.status(400).json({ message: "Game ID, user ID, and valid amount are required" });
+            }
+
+            const game = await this.engine.get("Game", "id", gameId);
+            if (!game || game.status !== "pending") {
+                return res.status(400).json({ message: "Game not found or not in pending state" });
+            }
+
+            const user = await this.engine.get("User", "id", userId);
+            if (!user || user.balance < amount) {
+                return res.status(400).json({ message: "Insufficient balance" });
+            }
+
+            const existingBet = await this.engine.getWhere("Bet", { gameId, userId });
+            if (existingBet.length > 0) {
+                return res.status(400).json({ message: "You have already placed a bet on this game" });
+            }
+
+            await this.engine.update("User", userId, { balance: user.balance - amount });
+            const bet = await this.engine.create("Bet", { gameId, userId, amount });
+
+            return res.status(200).json({ message: "Bet placed successfully", bet });
+        } catch (error) {
+            console.error("Error placing bet:", error);
             return res.status(500).json({ message: "Internal Server Error" });
         }
     }

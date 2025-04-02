@@ -1,9 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
+// schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,12 +7,12 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
 model User {
   id         String   @id @default(uuid())
   username   String   @unique
   email      String   @unique
   password   String
+  balance    Float    @default(0.0)
   created_at DateTime @default(now())
 
   role_id    String?
@@ -27,24 +22,47 @@ model User {
   gamesAsPlayer2 Game[] @relation("Player2")
   gamesWon       Game[] @relation("Winner")  
   Move           Move[]
+  bets           Bet[]
+
+  @@index([username])
+  @@index([role_id])
 }
 
 model Game {
   id             String   @id @default(uuid())
   player1        User?    @relation("Player1", fields: [player1Id], references: [id])
   player1Id      String?
-  player1Symbol  String?  // "X" or "O"
+  player1Symbol  String?
   player2        User?    @relation("Player2", fields: [player2Id], references: [id])
   player2Id      String?
-  player2Symbol  String?  // "X" or "O"
+  player2Symbol  String?
   winner         User?    @relation("Winner", fields: [winnerId], references: [id])
   winnerId       String?
-  status         String   @default("pending") // pending, ongoing, paused, finished
-  state          Json?    // Store board state on win/disconnect
+  status         String   @default("pending")
+  state          Json?
+  betAmount      Int
   created_at     DateTime @default(now())
   Move           Move[]
+  bets           Bet[]
+
+  @@index([player1Id])
+  @@index([player2Id])
+  @@index([winnerId])
+  @@index([status])
 }
 
+model Bet {
+  id         String   @id @default(uuid())
+  gameId     String
+  userId     String
+  amount     Int
+  created_at DateTime @default(now())
+  game       Game     @relation(fields: [gameId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@index([gameId])
+  @@index([userId])
+}
 
 model Move {
   id         String   @id @default(uuid())
@@ -54,10 +72,15 @@ model Move {
   playerId   String
   moveData   Json
   created_at DateTime @default(now())
+  
+  @@index([gameId])
+  @@index([playerId])
 }
 
 model User_roles {
   id        String @id @default(uuid())
   role_name String @unique
   users     User[]
+
+  @@index([role_name])
 }
