@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { AuthContext } from "../auth/AuthContext";
+import { AuthContext } from "../auth/AuthContext"
 import { useNavigate } from "react-router-dom";
 import CreateGame from "../components/CreateGame";
 import "./home.css";
@@ -111,13 +111,9 @@ const Home = () => {
                         <li className="menuItem" onClick={() => navigate("/how-to-play")}>
                             How to Play
                         </li>
-                        <li className="menuItem" onClick={() => handleToggle("game-history")}>
+                        <li className="menuItem" onClick={() => navigate("/game-history")}>
                             Game History
-                            {openDropdown === "game-history" && (
-                                <div className="dropdown">
-                                    <p>View past game results.</p>
-                                </div>
-                            )}
+                    
                         </li>
                         <li className="menuItem" onClick={() => navigate("/wallet")}>
                             Wallet

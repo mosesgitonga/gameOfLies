@@ -297,6 +297,67 @@ class Game {
             return res.status(500).json({ message: "Internal Server Error" });
         }
     }
+
+    async userGameHistory(req, res) {
+        const { userId } = req.params
+    
+        if (!userId) {
+            console.log("No user id in query params");
+            return res.status(400).json({ message: "User id not found" });
+        }
+    
+        try {
+            // Fetch finished games where the user was player1 or player2
+            const games = await this.engine.all("Game", { 
+                where: {
+                    status: "finished",
+                    OR: [
+                        { player1Id: userId },
+                        { player2Id: userId }
+                    ],
+                },
+            });
+    
+            if (!games.length) {
+                return res.status(200).json([]); 
+            }
+    
+            const sanitizedArray = await Promise.all(games.map(async (game) => {
+                let opponentId = ""
+                if (userId === game.player1Id) {
+                    opponentId = game.player2Id
+                } else if (userId === game.player2Id){
+                    opponentId = game.player1Id
+                }
+                console.log(opponentId)
+                const [opponent, user] = await Promise.all([
+                    this.engine.get("User", "id", opponentId),
+                    this.engine.get("User", "id", userId),
+                ]);
+                console.log("opponent: ",opponent.id, opponent.username)
+                console.log("Current user: ", user.username)
+                // Determine the game owner
+                let gameOwner = game.player1Id === opponent.id ? opponent : user;
+    
+                // Determine the winner
+                let winner = game.winnerId === opponentId ? user : opponent;
+    
+                return {
+                    gameOwner: gameOwner.username,
+                    opponent: opponent.username,
+                    winner: winner.username,
+                    entryFee: game.betAmount,
+                    created_at: game.created_at
+                };
+            }));
+    
+            return res.status(200).json(sanitizedArray);
+        } catch (error) {
+            console.error("Error: ", error);
+            return res.status(500).json({ message: "Internal server error" });
+        }
+    }
+    
 }
 
 export default Game;
