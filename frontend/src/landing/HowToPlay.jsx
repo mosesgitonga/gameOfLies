@@ -4,14 +4,14 @@ import "./styles/HowToPlay.css";
 const HowToPlay = () => {
     return (
         <div className="how-to-play-container">
-            <h1>How to Play Tic-Tac-Toe Tournaments</h1>
-            <p>Welcome! Follow these steps to create, join, and win in our exciting Tic-Tac-Toe Tournaments.</p>
+            <h1>How to Play 3 Men's morris Tournaments</h1>
+            <p>Welcome! Follow these steps to create, join, and win in our exciting 3 Men's Morris Tournaments.</p>
 
             <div className="container">
                 {/* Step 1: Creating a Tournament */}
                 <section className="step">
                     <h2>1. Create Your Tournament</h2>
-                    <p>Set up your own Tic-Tac-Toe Tournament:</p>
+                    <p>Set up your own 3 Mens's Morris Tournament:</p>
                     <ul>
                         <li>Log in to your account.</li>
                         <li>Navigate to the <strong>My Tournaments</strong> page.</li>
