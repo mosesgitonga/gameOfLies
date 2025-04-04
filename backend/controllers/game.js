@@ -340,7 +340,12 @@ class Game {
                 let gameOwner = game.player1Id === opponent.id ? opponent : user;
     
                 // Determine the winner
-                let winner = game.winnerId === opponentId ? user : opponent;
+                let winner = {}
+                if (game.winnerId === user.id) {
+                    winner = user
+                } else if (game.winnerId === opponent.id) {
+                    winner = opponent
+                }
     
                 return {
                     gameOwner: gameOwner.username,
@@ -355,6 +360,47 @@ class Game {
         } catch (error) {
             console.error("Error: ", error);
             return res.status(500).json({ message: "Internal server error" });
+        }
+    }
+
+    async destroyGame(req, res) {
+        const { gameId } = req.params;
+        const userId = req.userId;
+    
+        if (!gameId) {
+            console.error("Could not find game id in the params");
+            return res.status(400).json({ message: "Game id not found" });
+        }
+    
+        try {
+            const game = await this.engine.get("Game", "id", gameId);
+            if (!game) {
+                return res.status(404).json({ message: "Game not found" });
+            }
+    
+            if (game.player1Id !== userId) {
+                console.error("Not authorized to delete this game.");
+                return res.status(401).json({ message: "Not Authorized" });
+            }
+    
+            if (game.status !== "pending") {
+                console.error("Not allowed to delete non-pending games.");
+                return res.status(403).json({ message: "Not Allowed" });
+            }
+    
+            // Find and delete all related Bet records
+            const bets = await this.engine.getWhere("Bet", { gameId });
+            for (const bet of bets) {
+                await this.engine.delete("Bet", bet.id);
+                console.log(`Deleted Bet ${bet.id} for Game ${gameId}`);
+            }
+    
+            //delete the Game
+            await this.engine.delete("Game", gameId);
+            return res.status(200).json({ message: "You have destroyed a pending tounament." });
+        } catch (error) {
+            console.error("Error in destroyGame:", error);
+            return res.status(500).json({ message: "Internal Server Error" });
         }
     }
     

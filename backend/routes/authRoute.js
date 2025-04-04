@@ -17,4 +17,6 @@ authRouter.post('/api/auth/login', (req, res) => authController.login(req, res))
 authRouter.get('/api/auth/user', (req, res, next) => authMid.authUser(req, res, next), 
                                 (req, res) => user.getUserProfile(req, res))
 
+authRouter.post('/api/auth/refresh', (req, res) => authController.refresh_token(req, res))
+
 export default authRouter

@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 .gamehistory-container {
     display: flex;
     justify-content: center;
@@ -5,8 +6,10 @@
     min-height: 100vh;
     background: #1a1a1a;
     color: #fff;
-    font-family: 'Arial', sans-serif;
+    /* font-family: 'Arial', sans-serif; */
     width: 100vw;
+    /* font-family: "orbitron"; */
+    letter-spacing: 1px;
 }
 
 .gamehistory-content {
@@ -108,6 +111,7 @@
     white-space: nowrap; /* Prevent wrapping */
     overflow: hidden;
     text-overflow: ellipsis; /* Truncate long text */
+
 }
 
 .gamehistory-outcome-won {

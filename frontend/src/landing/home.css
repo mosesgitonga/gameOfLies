@@ -25,7 +25,10 @@ header {
     padding: 0 15px;
     box-shadow: 0 2px 4px rgba(143, 151, 151, 0.2);
 }
-
+header h1 {
+    letter-spacing: 4px;
+    font-weight: 100px;
+}
 /* Heading */
 #heading {
     margin: 0;
@@ -170,6 +173,7 @@ nav ul li {
     padding: 10px;
     position: absolute;
     z-index: 10;
+    width: 400px;
 }
 
 .create-game {
@@ -183,14 +187,15 @@ nav ul li {
 
 .create-game button {
     padding: 5px 10px;
-    background-color: #3498db;
+    background-color: #000000;
     color: white;
     border: none;
     cursor: pointer;
 }
 
 .create-game button:hover {
-    background-color: #2980b9;
+    background-color: #b7babd;
+    color: #333;
 }
 
 /* Dropdown Content */
@@ -198,6 +203,7 @@ nav ul li {
     margin: 8px 0;
     padding: 5px;
     font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+    color: #111;
 }
 
 .dropdown aside {
@@ -207,7 +213,7 @@ nav ul li {
 .dropdown h3 {
     margin: 0 0 10px;
     font-size: clamp(1rem, 3vw, 1.2rem);
-    color: #fff;
+    color: #000000;
     border-bottom: 1px solid #8f9797;
     padding-bottom: 5px;
 }
@@ -262,7 +268,7 @@ nav ul li {
     font-size: clamp(0.9rem, 2.5vw, 1rem);
 }
 
-.gameItem button {
+.gameItem > button {
     background: #8f9797;
     color: #000;
     border: none;

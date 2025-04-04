@@ -112,12 +112,12 @@ function setupSocket(io) {
                 socket.emit("roomError", "Game not started, over, or not your turn.");
                 return;
             }
-
+        
             if (!room.players[userId] || room.players[userId].symbol !== player) {
                 socket.emit("roomError", "Unauthorized move attempt.");
                 return;
             }
-
+        
             if (room.placedPieces[player] < 3) {
                 if (!room.pieces[pos]) {
                     room.pieces[pos] = player;
@@ -130,24 +130,60 @@ function setupSocket(io) {
                 socket.emit("roomError", "Invalid move.");
                 return;
             }
-
+        
             const winner = checkWinner(room.pieces);
             if (winner) {
                 room.winner = winner;
             }
-
+        
             room.currentPlayer = room.currentPlayer === "X" ? "O" : "X";
-
-            await engine.update("Game", roomId, {
+        
+            // Prepare game update
+            const gameUpdate = {
                 state: JSON.stringify({
                     pieces: room.pieces,
                     currentPlayer: room.currentPlayer,
                     placedPieces: room.placedPieces,
                 }),
                 status: room.winner ? "finished" : "inProgress",
-                ...(room.winner && { winnerId: Object.keys(room.players).find(uid => room.players[uid].symbol === room.winner) }),
-            });
-
+            };
+        
+            let winnerId;
+            if (room.winner) {
+                winnerId = Object.keys(room.players).find(uid => room.players[uid].symbol === room.winner);
+                gameUpdate.winnerId = winnerId;
+            }
+        
+            try {
+                // Fetch the game to get entryFee
+                const game = await engine.get("Game", "id", roomId);
+                if (!game) {
+                    socket.emit("roomError", "Game not found in database.");
+                    return;
+                }
+        
+                // Update game state
+                await engine.update("Game", roomId, gameUpdate);
+        
+                // If there's a winner, update their balance
+                if (room.winner) {
+                    const prize = game.betAmount * 2; // Both players' fees
+                    const winnerUser = await engine.get("User", "id", winnerId);
+                    if (!winnerUser) {
+                        socket.emit("roomError", "Winner user not found.");
+                        return;
+                    }
+        
+                    const newBalance = (winnerUser.balance || 0) + prize;
+                    await engine.update("User", winnerId, { balance: newBalance });
+                    console.log(`Updated balance for winner ${winnerId} from ${winnerUser.balance} to ${newBalance} with prize ${prize}`);
+                }
+            } catch (error) {
+                console.error("Error updating game or balance:", error);
+                socket.emit("roomError", "Failed to update game state or winner balance.");
+                return;
+            }
+        
             io.to(roomId).emit("gameState", {
                 roomId,
                 pieces: room.pieces,
@@ -156,7 +192,7 @@ function setupSocket(io) {
                 placedPieces: room.placedPieces,
                 gameStarted: room.gameStarted,
             });
-
+        
             console.log(`Move made by ${userId} in room ${roomId}:`, room.pieces);
         });
 

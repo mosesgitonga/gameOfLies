@@ -48,7 +48,7 @@ const CreateGame = ({ onGameCreated }) => {
 
     return (
         <div className="create-game" onClick={(e) => e.stopPropagation()}>
-            <h3>Create New Tournament</h3> {/* Changed from "Create New Game" */}
+            <h3>Enter Tournament Entry Fee: </h3> {/* Changed from "Create New Game" */}
             <input
                 type="number"
                 step="1"
@@ -61,7 +61,7 @@ const CreateGame = ({ onGameCreated }) => {
                 min="1"
                 placeholder="Set entry fee"
             />
-            <button onClick={handleCreate}>Create</button>
+            <button onClick={handleCreate}>Create Tournament</button>
             {error && <p style={{ color: "red" }}>{error}</p>}
         </div>
     );

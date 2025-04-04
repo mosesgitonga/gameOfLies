@@ -79,17 +79,16 @@ const Home = () => {
                     <span></span>
                     <span></span>
                 </div>
-                <h1 id="heading">Game of Lies</h1>
+                <h1 id="heading">Vector</h1>
                 <nav>
                     <ul className="nav-list">
                         <li onClick={() => navigate("/about")}>About</li>
                         {isAuthenticated ? (
                             <li>
                                 <img
-                                    src="/profile-icon.png"
-                                    alt="Profile"
+                                    src="/"
+                                    alt={user?.username ? user.username : "profile"}
                                     className="profile-icon"
-                                    onClick={() => navigate("/profile")}
                                 />
                             </li>
                         ) : (
@@ -120,7 +119,7 @@ const Home = () => {
                         </li>
                         {isAuthenticated && (
                             <li className="menuItem" onClick={() => handleToggle("create-game")}>
-                                Create Tournament {/* Changed from "Create Game" */}
+                                Create Tournament. {/* Changed from "Create Game" */}
                                 {openDropdown === "create-game" && (
                                     <div className="dropdown" onClick={(e) => e.stopPropagation()}>
                                         {showCreateGame ? (

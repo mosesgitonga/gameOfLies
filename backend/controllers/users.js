@@ -68,10 +68,14 @@ class User {
             return res.status(400).json({ "message": "Missing Data" })
         }
         let floatAmount = parseFloat(amount)
-        if (floatAmount <= 0) {
-            console.error("cannot deposit 0 or less amount")
-            return res.status(400).json({ "message": "You must deposit an amount greater than zero" })
+        if (floatAmount >= 1000000) {
+            return res.status(403).json({
+                "message": "Hello Elon Musk, Your ambitions are inspiring, but unfortunately, our dummy wallet was not build to create infinite wealth for you. Try a more believable amount."
+            });
         }
+        
+
+
 
         try {
             const user = await this.engine.get("User", "id", userId);

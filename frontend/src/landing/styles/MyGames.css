@@ -173,6 +173,29 @@
   transform: translateY(-1px);
 }
 
+.destroy-game-button {
+  background: #ff4444;
+  border: none;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-left: 0.5rem;
+}
+
+.destroy-game-button:hover {
+  background: #cc3333;
+  box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+}
+
+/* Ensure button group accommodates the new button */
+.button-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .my-games-list {

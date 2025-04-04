@@ -80,6 +80,40 @@ class Auth {
             return res.status(500).json({ "error": "Internal Server Error" });
         }
     }
+    async refresh_token(req, res) {
+        const { refresh_token } = req.body;
+    
+        if (!refresh_token) {
+            return res.status(400).json({ message: "Refresh token not found" });
+        }
+    
+        try {
+            const decoded = jwt.verify(refresh_token, process.env.REFRESH_TOKEN_SECRET);
+            const userId = decoded.id;
+    
+            const user = await this.engine.get("User", "id", userId);
+            if (!user) {
+                return res.status(401).json({ message: "Invalid refresh token: User not found" });
+            }
+    
+            const payload = { id: user.id, email: user.email, roleId: user.role_id };
+            const newAccessToken = this.helper.generateAccessToken(payload);
+    
+            console.log("New access token generated for user:", userId);
+            return res.status(200).json({
+                message: "Token refreshed",
+                access_token: newAccessToken,
+            });
+        } catch (error) {
+            console.error("Error refreshing token:", error);
+            if (error.name === "TokenExpiredError") {
+                return res.status(401).json({ message: "Refresh token expired" });
+            } else if (error.name === "JsonWebTokenError") {
+                return res.status(401).json({ message: "Invalid refresh token" });
+            }
+            return res.status(500).json({ message: "Internal Server Error" });
+        }
+    }
 }
 
 export default Auth;
