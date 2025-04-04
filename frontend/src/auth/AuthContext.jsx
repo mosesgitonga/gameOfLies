@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 
 export const AuthContext = createContext();
+const base_url = import.meta.env.VITE_BASE_URL;
 
 const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -25,7 +26,7 @@ const AuthProvider = ({ children }) => {
 
     const fetchUser = async (token) => {
         try {
-            const res = await fetch("http://localhost:5000/api/auth/user", {
+            const res = await fetch(`${base_url}/api/auth/user`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             const data = await res.json();
@@ -52,7 +53,7 @@ const AuthProvider = ({ children }) => {
 
         try {
             console.log("Refreshing token with:", refreshToken);
-            const res = await fetch("http://localhost:5000/api/auth/refresh", {
+            const res = await fetch(`${base_url}/api/auth/refresh`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ refresh_token: refreshToken }),

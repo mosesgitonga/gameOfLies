@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../auth/AuthContext";
 import "./GameHistory.css";
 
+const base_url = import.meta.env.VITE_BASE_URL;
+
+
 function GameHistory() {
     const { user, isAuthenticated, loading: authLoading } = useContext(AuthContext);
     const navigate = useNavigate();
@@ -26,7 +29,7 @@ function GameHistory() {
                 const token = localStorage.getItem("access_token");
                 if (!token) throw new Error("No access token found");
 
-                const response = await fetch(`http://localhost:5000/api/history/games/${user.id}`, {
+                const response = await fetch(`${base_url}/api/history/games/${user.id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 

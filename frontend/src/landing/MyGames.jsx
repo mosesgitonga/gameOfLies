@@ -3,6 +3,7 @@ import { AuthContext } from "../auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import CreateGame from "../components/CreateGame"
 import "./styles/MyGames.css";
+import { basename } from "path";
 
 const MyGames = () => {
     const [userGames, setUserGames] = useState([]);
@@ -30,7 +31,7 @@ const MyGames = () => {
             setLoading(true);
             try {
                 console.log("Fetching games for user:", user.id);
-                const response = await fetchWithAuth(`http://localhost:5000/api/user/games/${user.id}`);
+                const response = await fetchWithAuth(`${base_url}/api/user/games/${user.id}`);
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.message || "Failed to fetch games");
@@ -71,7 +72,7 @@ const MyGames = () => {
         if (!window.confirm("Are you sure you want to delete this game?")) return;
 
         try {
-            const response = await fetchWithAuth(`http://localhost:5000/api/game/destroy/${gameId}`, {
+            const response = await fetchWithAuth(`${base_url}/api/game/destroy/${gameId}`, {
                 method: "DELETE",
             });
 

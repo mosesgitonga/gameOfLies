@@ -5,7 +5,10 @@ import Celebration from "../components/celebration";
 import { AuthContext } from "../auth/AuthContext";
 import "./GameBoard.css";
 
-const socket = io("http://localhost:5000", {
+const base_url = import.meta.env.VITE_BASE_URL;
+
+
+const socket = io(`${base_url}`, {
     reconnection: true,
     reconnectionAttempts: 5,
     reconnectionDelay: 1000,
@@ -77,7 +80,7 @@ function GameBoard({ roomId: propRoomId }) {
                 if (!token) throw new Error("No access token found");
 
                 // Fetch user balance
-                const userResponse = await fetch(`http://localhost:5000/api/auth/user`, {
+                const userResponse = await fetch(`${base_url}/api/auth/user`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 if (!userResponse.ok) throw new Error(`Failed to fetch user: ${userResponse.status}`);
@@ -85,7 +88,7 @@ function GameBoard({ roomId: propRoomId }) {
                 setUserBalance(userData.user.balance);
 
                 // Fetch game state
-                const response = await fetch(`http://localhost:5000/api/game/${effectiveRoomId}`, {
+                const response = await fetch(`${base_url}/api/game/${effectiveRoomId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 if (!response.ok) {
@@ -189,7 +192,7 @@ function GameBoard({ roomId: propRoomId }) {
     const handleAcceptBet = async () => {
         try {
             const token = localStorage.getItem("access_token");
-            const joinResponse = await fetch("http://localhost:5000/api/game/join", {
+            const joinResponse = await fetch(`${base_url}/api/game/join`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",

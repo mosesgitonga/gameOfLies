@@ -4,6 +4,9 @@ import { useNavigate } from "react-router-dom";
 import CreateGame from "../components/CreateGame";
 import "./home.css";
 
+const base_url = import.meta.env.VITE_BASE_URL;
+
+
 const Home = () => {
     const [games, setGames] = useState([]);
     const [menuOpen, setMenuOpen] = useState(false);
@@ -16,7 +19,7 @@ const Home = () => {
     useEffect(() => {
         const fetchGames = async () => {
             try {
-                const response = await fetch("http://localhost:5000/api/games", {
+                const response = await fetch(`${base_url}/api/games`, {
                     headers: isAuthenticated ? { Authorization: `Bearer ${localStorage.getItem("access_token")}` } : {},
                 });
                 if (!response.ok) throw new Error("Failed to fetch games");

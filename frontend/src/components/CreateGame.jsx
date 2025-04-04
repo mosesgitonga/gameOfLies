@@ -1,6 +1,8 @@
 import { useState, useContext } from "react";
 import { AuthContext } from "../auth/AuthContext";
 
+const base_url = import.meta.env.VITE_BASE_URL;
+
 const CreateGame = ({ onGameCreated }) => {
     const { user } = useContext(AuthContext);
     const [entryFee, setEntryFee] = useState(0); // Changed from betAmount
@@ -18,7 +20,7 @@ const CreateGame = ({ onGameCreated }) => {
         try {
             const token = localStorage.getItem("access_token");
             if (!token) throw new Error("No access token found");
-            const response = await fetch("http://localhost:5000/api/game", {
+            const response = await fetch(`${base_url}/api/game`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

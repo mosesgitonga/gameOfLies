@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../auth/AuthContext.jsx"
 import "./Wallet.css";
 
+const base_url = import.meta.env.VITE_BASE_URL;
+
+
 const Wallet = () => {
     const { user, isAuthenticated, loading: authLoading } = useContext(AuthContext);
     const navigate = useNavigate();
@@ -22,7 +25,7 @@ const Wallet = () => {
         const fetchBalance = async () => {
             try {
                 const token = localStorage.getItem("access_token");
-                const response = await fetch(`http://localhost:5000/api/auth/user`, {
+                const response = await fetch(`${base_url}/api/auth/user`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 if (!response.ok) throw new Error("Failed to fetch balance");
@@ -45,7 +48,7 @@ const Wallet = () => {
 
         try {
             const token = localStorage.getItem("access_token");
-            const response = await fetch("http://localhost:5000/api/user/deposit", {
+            const response = await fetch(`${base_url}/api/user/deposit`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",

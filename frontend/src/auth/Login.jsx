@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
 import { AuthContext } from "./AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
+const base_url = import.meta.env.VITE_BASE_URL;
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -15,7 +16,7 @@ const Login = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch("http://localhost:5000/api/auth/login", {
+            const response = await fetch(`${base_url}/api/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
@@ -27,7 +28,7 @@ const Login = () => {
                 return;
             }
 
-            const userResponse = await fetch("http://localhost:5000/api/auth/user", {
+            const userResponse = await fetch(`${base_url}/api/auth/user`, {
                 headers: { Authorization: `Bearer ${data.access_token}` },
             });
             const userData = await userResponse.json();
