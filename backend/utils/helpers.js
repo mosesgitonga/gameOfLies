@@ -16,7 +16,7 @@ class Helper {
 
     async generateRefreshToken(payload) {
         const expiresIn = '8d'
-        return jwt.sign(payload, process.env.REFRESH_SECRET, { expiresIn })
+        return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn })
 
     }
 

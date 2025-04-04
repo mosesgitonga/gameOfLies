@@ -21,17 +21,24 @@ function setupSocket(io) {
                 return;
             }
 
+            // Check if user is a player; don’t update DB here
+            const isPlayer = game.player1Id === userId || game.player2Id === userId;
+            if (!isPlayer) {
+                // socket.emit("roomError", "You are not a player in this game yet.");
+                return;
+            }
+
             let gameState;
             try {
                 gameState = game.state ? JSON.parse(game.state) : {
-                    pieces: {},
+                    pieces: { A: null, B: null, C: null, D: null, E: null, F: null, G: null, H: null, I: null },
                     currentPlayer: game.player1Symbol || "X",
                     placedPieces: { X: 0, O: 0 },
                 };
             } catch (error) {
                 console.error(`Invalid JSON in game.state for room ${roomId}:`, game.state, error);
                 gameState = {
-                    pieces: {},
+                    pieces: { A: null, B: null, C: null, D: null, E: null, F: null, G: null, H: null, I: null },
                     currentPlayer: game.player1Symbol || "X",
                     placedPieces: { X: 0, O: 0 },
                 };
@@ -39,7 +46,7 @@ function setupSocket(io) {
                 console.log(`Reset corrupted state for game ${roomId}`);
             }
 
-            if (!rooms[roomId]) {
+            if (!rooms[roomId] || game.status === "pending" || game.status === "finished") {
                 rooms[roomId] = {
                     players: {},
                     pieces: gameState.pieces,
@@ -57,36 +64,28 @@ function setupSocket(io) {
                 return;
             }
 
-            const playerSymbol = userId === game.player1Id ? game.player1Symbol : game.player2Id === userId ? game.player2Symbol : null;
+            const playerSymbol = userId === game.player1Id ? game.player1Symbol : game.player2Symbol;
             let wasDisconnected = false;
-            if (!playerSymbol && userId !== game.player1Id && !game.player2Id) {
-                await engine.update("Game", roomId, {
-                    player2Id: userId,
-                    player2Symbol: "O",
-                    status: "ongoing",
-                });
-                room.players[userId] = { symbol: "O", socketId: socket.id };
-                const updatedGame = await engine.get("Game", "id", roomId);
-                room.gameStarted = updatedGame.status === "ongoing" || updatedGame.status === "inProgress";
-            } else if (playerSymbol) {
-                wasDisconnected = room.players[userId]?.disconnected;
+            if (room.players[userId]) {
+                wasDisconnected = room.players[userId].disconnected;
                 room.players[userId] = { symbol: playerSymbol, socketId: socket.id };
                 delete room.players[userId].disconnected;
             } else {
-                socket.emit("roomError", "Player symbol not assigned.");
-                return;
+                room.players[userId] = { symbol: playerSymbol, socketId: socket.id };
             }
 
-            const symbol = room.players[userId].symbol;
             socket.join(roomId);
-            console.log("Emitting assignSymbol to", userId, "with symbol", symbol);
-            socket.emit("assignSymbol", { userId, symbol });
+            console.log("Emitting assignSymbol to", userId, "with symbol", playerSymbol);
+            socket.emit("assignSymbol", { userId, symbol: playerSymbol });
 
             console.log(`Room ${roomId} status:`, { playerCount: Object.keys(room.players).length, gameStarted: room.gameStarted, dbStatus: game.status });
 
             if (Object.keys(room.players).length === 2 && !room.gameStarted) {
                 room.gameStarted = true;
-                await engine.update("Game", roomId, { status: "inProgress" });
+                // Only update status to "inProgress" if not already set; DB update happens elsewhere
+                if (game.status !== "inProgress") {
+                    await engine.update("Game", roomId, { status: "inProgress" });
+                }
                 io.to(roomId).emit("gameReady", { roomId });
                 console.log(`Game started in room ${roomId} - emitted gameReady`);
                 if (wasDisconnected) {
@@ -104,7 +103,7 @@ function setupSocket(io) {
                 gameStarted: room.gameStarted,
             });
 
-            console.log(`Player ${userId} joined room ${roomId} as ${symbol}`);
+            console.log(`Player ${userId} joined room ${roomId} as ${playerSymbol}`);
         });
 
         socket.on("makeMove", async ({ pos, player, selectedPiece, roomId, userId }) => {
@@ -113,12 +112,12 @@ function setupSocket(io) {
                 socket.emit("roomError", "Game not started, over, or not your turn.");
                 return;
             }
-
+        
             if (!room.players[userId] || room.players[userId].symbol !== player) {
                 socket.emit("roomError", "Unauthorized move attempt.");
                 return;
             }
-
+        
             if (room.placedPieces[player] < 3) {
                 if (!room.pieces[pos]) {
                     room.pieces[pos] = player;
@@ -131,24 +130,60 @@ function setupSocket(io) {
                 socket.emit("roomError", "Invalid move.");
                 return;
             }
-
+        
             const winner = checkWinner(room.pieces);
             if (winner) {
                 room.winner = winner;
             }
-
+        
             room.currentPlayer = room.currentPlayer === "X" ? "O" : "X";
-
-            await engine.update("Game", roomId, {
+        
+            // Prepare game update
+            const gameUpdate = {
                 state: JSON.stringify({
                     pieces: room.pieces,
                     currentPlayer: room.currentPlayer,
                     placedPieces: room.placedPieces,
                 }),
                 status: room.winner ? "finished" : "inProgress",
-                ...(room.winner && { winnerId: Object.keys(room.players).find(uid => room.players[uid].symbol === room.winner) }),
-            });
-
+            };
+        
+            let winnerId;
+            if (room.winner) {
+                winnerId = Object.keys(room.players).find(uid => room.players[uid].symbol === room.winner);
+                gameUpdate.winnerId = winnerId;
+            }
+        
+            try {
+                // Fetch the game to get entryFee
+                const game = await engine.get("Game", "id", roomId);
+                if (!game) {
+                    socket.emit("roomError", "Game not found in database.");
+                    return;
+                }
+        
+                // Update game state
+                await engine.update("Game", roomId, gameUpdate);
+        
+                // If there's a winner, update their balance
+                if (room.winner) {
+                    const prize = game.betAmount * 2; // Both players' fees
+                    const winnerUser = await engine.get("User", "id", winnerId);
+                    if (!winnerUser) {
+                        socket.emit("roomError", "Winner user not found.");
+                        return;
+                    }
+        
+                    const newBalance = (winnerUser.balance || 0) + prize;
+                    await engine.update("User", winnerId, { balance: newBalance });
+                    console.log(`Updated balance for winner ${winnerId} from ${winnerUser.balance} to ${newBalance} with prize ${prize}`);
+                }
+            } catch (error) {
+                console.error("Error updating game or balance:", error);
+                socket.emit("roomError", "Failed to update game state or winner balance.");
+                return;
+            }
+        
             io.to(roomId).emit("gameState", {
                 roomId,
                 pieces: room.pieces,
@@ -157,7 +192,7 @@ function setupSocket(io) {
                 placedPieces: room.placedPieces,
                 gameStarted: room.gameStarted,
             });
-
+        
             console.log(`Move made by ${userId} in room ${roomId}:`, room.pieces);
         });
 

@@ -1,0 +1,214 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+.gamehistory-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #1a1a1a;
+    color: #fff;
+    /* font-family: 'Arial', sans-serif; */
+    width: 100vw;
+    /* font-family: "orbitron"; */
+    letter-spacing: 1px;
+}
+
+.gamehistory-content {
+    background: rgba(40, 40, 40, 0.9);
+    padding: 2rem;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 1200px; /* Increased max-width for better desktop fit */
+    box-shadow: 0 0 20px rgba(99, 91, 97, 0.2), 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.gamehistory-title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(143, 140, 142, 0.8), 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+.gamehistory-error-message {
+    color: #ff4444;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.gamehistory-controls {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem; /* Reduced gap for tighter fit */
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.gamehistory-sort-button {
+    background: #333;
+    border: 1px solid #555;
+    color: #fff;
+    padding: 0.5rem 0.75rem; /* Smaller padding */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem; /* Smaller font */
+}
+
+.gamehistory-sort-button:hover {
+    background: #444;
+    box-shadow: 0 0 5px rgba(223, 211, 220, 0.5);
+}
+
+.gamehistory-sort-button.active {
+    background: #555;
+    border-color: rgba(0, 0, 0, 0.8);
+    color: rgba(230, 215, 226, 0.8);
+}
+
+.gamehistory-empty {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #888;
+}
+
+.gamehistory-table {
+    display: grid;
+    grid-template-columns: 
+        minmax(120px, 1fr) /* Game Owner */
+        minmax(120px, 1fr) /* Opponent */
+        minmax(120px, 1fr) /* Winner */
+        minmax(100px, 1fr) /* Entry Fee */
+        minmax(100px, 1fr) /* Outcome */
+        minmax(150px, 1fr); /* Date */
+    gap: 0.5rem;
+    width: 100%;
+    font-size: 0.95rem; /* Slightly smaller font for better fit */
+}
+
+.gamehistory-header {
+    display: contents;
+}
+
+.gamehistory-header > span {
+    font-weight: bold;
+    padding: 0.75rem;
+    background: #2a2a2a;
+    border-bottom: 2px solid rgba(187, 185, 185, 0.5);
+    text-align: center;
+    white-space: nowrap; /* Prevent wrapping */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Truncate long text */
+}
+
+.gamehistory-row {
+    display: contents;
+}
+
+.gamehistory-row > span {
+    padding: 0.75rem;
+    text-align: center;
+    border-bottom: 1px solid #333;
+    white-space: nowrap; /* Prevent wrapping */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Truncate long text */
+
+}
+
+.gamehistory-outcome-won {
+    color: rgba(115, 255, 0, 0.8);
+}
+
+.gamehistory-outcome-lost {
+    color: #ff2626;
+}
+
+.gamehistory-outcome-no-winner {
+    color: #888;
+}
+
+.gamehistory-footer {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.gamehistory-back-button {
+    background: #333;
+    border: 1px solid #555;
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.gamehistory-back-button:hover {
+    background: #8a8888;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .gamehistory-content {
+        padding: 1rem; /* Less padding on mobile */
+        width: 95%; /* Wider on small screens */
+    }
+
+    .gamehistory-table {
+        display: block; /* Switch to block for mobile */
+    }
+
+    .gamehistory-header {
+        display: none; /* Hide header on mobile */
+    }
+
+    .gamehistory-row {
+        display: block;
+        background: #2a2a2a;
+        border-radius: 5px;
+        margin-bottom: 1rem;
+        padding: 1rem;
+        border: 1px solid #333;
+    }
+
+    .gamehistory-row > span {
+        display: block;
+        text-align: left;
+        padding: 0.5rem 0;
+        border-bottom: none;
+        white-space: normal; /* Allow wrapping on mobile */
+        overflow: visible; /* Show full text */
+        text-overflow: initial;
+    }
+
+    /* Add labels for clarity on mobile */
+    .gamehistory-row > span:nth-child(1)::before {
+        content: "Game Owner: ";
+        color: #888;
+        font-weight: bold;
+    }
+    .gamehistory-row > span:nth-child(2)::before {
+        content: "Opponent: ";
+        color: #888;
+        font-weight: bold;
+    }
+    .gamehistory-row > span:nth-child(3)::before {
+        content: "Winner: ";
+        color: #888;
+        font-weight: bold;
+    }
+    .gamehistory-row > span:nth-child(4)::before {
+        content: "Entry Fee: ";
+        color: #888;
+        font-weight: bold;
+    }
+    .gamehistory-row > span:nth-child(5)::before {
+        content: "Outcome: ";
+        color: #888;
+        font-weight: bold;
+    }
+    .gamehistory-row > span:nth-child(6)::before {
+        content: "Date: ";
+        color: #888;
+        font-weight: bold;
+    }
+}

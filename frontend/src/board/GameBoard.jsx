@@ -28,7 +28,7 @@ function GameBoard({ roomId: propRoomId }) {
     const { user, isAuthenticated, loading: authLoading } = useContext(AuthContext);
     const { id } = useParams();
     const navigate = useNavigate();
-    const location = useLocation(); // To get the current URL
+    const location = useLocation();
     const effectiveRoomId = propRoomId || id;
 
     const [pieces, setPieces] = useState({
@@ -44,12 +44,14 @@ function GameBoard({ roomId: propRoomId }) {
     const [gameReady, setGameReady] = useState(false);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [userBalance, setUserBalance] = useState(0);
+    const [showBetPopup, setShowBetPopup] = useState(false);
+    const [betAmount, setBetAmount] = useState(0);
 
     useEffect(() => {
         if (authLoading) return;
 
         if (!isAuthenticated || !user) {
-            // Capture the current URL and redirect to login with it as a query param
             const redirectUrl = location.pathname + location.search;
             navigate(`/login?redirect=${encodeURIComponent(redirectUrl)}`);
             return;
@@ -61,71 +63,59 @@ function GameBoard({ roomId: propRoomId }) {
             return;
         }
 
+        // Connect socket early
+        socket.connect();
+        socket.on("connect", () => {
+            console.log("Socket connected, joining room:", effectiveRoomId);
+            socket.emit("joinRoom", { roomId: effectiveRoomId, userId: user.id });
+        });
+
         const initializeGame = async () => {
             try {
-                console.log("Fetching game with ID:", effectiveRoomId);
+                console.log("Initializing game with ID:", effectiveRoomId);
                 const token = localStorage.getItem("access_token");
                 if (!token) throw new Error("No access token found");
 
+                // Fetch user balance
+                const userResponse = await fetch(`http://localhost:5000/api/auth/user`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                if (!userResponse.ok) throw new Error(`Failed to fetch user: ${userResponse.status}`);
+                const userData = await userResponse.json();
+                setUserBalance(userData.user.balance);
+
+                // Fetch game state
                 const response = await fetch(`http://localhost:5000/api/game/${effectiveRoomId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({}));
-                    if (errorData.code === 1 && errorData.message === "Session ID unknown") {
-                        console.error("Session ID unknown - redirecting to login");
-                        localStorage.removeItem("access_token");
-                        navigate(`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`);
-                        return;
-                    }
-                    throw new Error(`Fetch failed: ${response.status} - ${errorData.message || await response.text()}`);
+                    throw new Error(`Fetch game failed: ${response.status} - ${errorData.message || await response.text()}`);
                 }
                 const game = await response.json();
-                console.log("Initial game state fetched:", game);
+                console.log("Game state fetched:", game);
 
                 const isPlayer1 = game.player1Id === user.id;
                 const isPlayer2 = game.player2Id === user.id;
 
-                if (!isPlayer1 && !isPlayer2 && !game.player2Id) {
-                    console.log(`User ${user.id} attempting to join game ${effectiveRoomId}`);
-                    const joinResponse = await fetch("http://localhost:5000/api/game/join", {
-                        method: "PATCH",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`,
-                        },
-                        body: JSON.stringify({ gameId: effectiveRoomId, userId: user.id }),
-                    });
-                    if (!joinResponse.ok) {
-                        const joinErrorData = await joinResponse.json().catch(() => ({}));
-                        if (joinErrorData.code === 1 && joinErrorData.message === "Session ID unknown") {
-                            console.error("Session ID unknown on join - redirecting to login");
-                            localStorage.removeItem("access_token");
-                            navigate(`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`);
-                            return;
-                        }
-                        throw new Error(`Join failed: ${joinResponse.status} - ${joinErrorData.message || await joinResponse.text()}`);
-                    }
-                    console.log("Joined game:", await joinResponse.json());
-                } else if (!isPlayer1 && !isPlayer2) {
-                    throw new Error("Game is already full");
+                if (isPlayer1 || isPlayer2) {
+                    // Existing player: set state from game data
+                    setPieces(game.state.pieces || pieces);
+                    setCurrentPlayer(game.state.currentPlayer || "X");
+                    setPlacedPieces(game.state.placedPieces || { X: 0, O: 0 });
+                    setWinner(game.winnerId ? (game.winnerId === game.player1Id ? "X" : "O") : null);
+                    setShowCelebration(!!game.winnerId);
+                    setGameReady(game.status === "ongoing" || game.status === "inProgress");
+                    setPlayerSymbol(isPlayer1 ? game.player1Symbol : game.player2Symbol);
+                    setLoading(false);
+                } else if (!game.player2Id && game.status === "pending") {
+                    // New player: show bet popup
+                    setBetAmount(game.betAmount || 0);
+                    setShowBetPopup(true);
+                    setLoading(false);
+                } else {
+                    throw new Error("Game is not joinable (full or finished).");
                 }
-
-                setPieces(game.state.pieces || pieces);
-                setCurrentPlayer(game.state.currentPlayer || "X");
-                setPlacedPieces(game.state.placedPieces || { X: 0, O: 0 });
-                setWinner(game.winnerId ? (game.winnerId === game.player1Id ? "X" : "O") : null);
-                setShowCelebration(!!game.winnerId);
-                setGameReady(game.status === "ongoing" || game.status === "inProgress");
-                setPlayerSymbol(isPlayer1 ? game.player1Symbol : game.player2Symbol);
-                console.log("Initial gameReady set to:", game.status === "ongoing" || game.status === "inProgress");
-
-                socket.connect();
-                socket.on("connect", () => {
-                    console.log("Socket connected, joining room:", effectiveRoomId);
-                    socket.emit("joinRoom", { roomId: effectiveRoomId, userId: user.id });
-                });
-                setLoading(false);
             } catch (err) {
                 console.error("Initialization error:", err);
                 setError(err.message);
@@ -135,18 +125,22 @@ function GameBoard({ roomId: propRoomId }) {
 
         initializeGame();
 
-        socket.on("connect_error", (err) => setError("Connection failed: " + err.message));
+        socket.on("connect_error", (err) => {
+            console.error("Socket connect error:", err);
+            setError("Failed to connect to game server.");
+            setLoading(false);
+        });
 
         socket.on("assignSymbol", ({ userId, symbol }) => {
             console.log("Received assignSymbol:", { userId, symbol });
-            if (userId === user.id) {
-                setPlayerSymbol(symbol);
-            }
+            if (userId === user.id) setPlayerSymbol(symbol);
         });
 
         socket.on("gameReady", ({ roomId }) => {
             if (roomId === effectiveRoomId) {
                 setGameReady(true);
+                setShowBetPopup(false);
+                setLoading(false);
                 console.log("Game is ready via socket!");
             }
         });
@@ -155,28 +149,29 @@ function GameBoard({ roomId: propRoomId }) {
             if (roomId === effectiveRoomId) {
                 setGameReady(true);
                 setError(null);
+                setLoading(false);
                 console.log("Game resumed via socket!");
             }
         });
 
         socket.on("gameState", (data) => {
             if (data.roomId === effectiveRoomId) {
+                console.log("Received gameState:", data);
                 setPieces(data.pieces || pieces);
                 setCurrentPlayer(data.currentPlayer || "X");
                 setWinner(data.winner);
                 setPlacedPieces(data.placedPieces || { X: 0, O: 0 });
                 setGameReady(data.gameStarted);
                 setShowCelebration(!!data.winner);
-                console.log("Game state updated, gameReady:", data.gameStarted, "data:", data);
+                setLoading(false);
             }
         });
 
         socket.on("roomError", (message) => {
             setError(message);
-            if (message.includes("disconnected")) {
-                setGameReady(false);
-            }
+            if (message.includes("disconnected")) setGameReady(false);
             console.error("Room error:", message);
+            setLoading(false);
         });
 
         return () => {
@@ -191,14 +186,48 @@ function GameBoard({ roomId: propRoomId }) {
         };
     }, [effectiveRoomId, user, isAuthenticated, authLoading, navigate, location]);
 
+    const handleAcceptBet = async () => {
+        try {
+            const token = localStorage.getItem("access_token");
+            const joinResponse = await fetch("http://localhost:5000/api/game/join", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ gameId: effectiveRoomId, userId: user.id }),
+            });
+
+            if (!joinResponse.ok) {
+                const joinErrorData = await joinResponse.json();
+                throw new Error(joinErrorData.message || "Failed to join game");
+            }
+
+            console.log("Joined game:", await joinResponse.json());
+            setShowBetPopup(false);
+            socket.emit("joinRoom", { roomId: effectiveRoomId, userId: user.id }); // Sync with socket
+        } catch (err) {
+            console.error("Join error:", err);
+            setError(err.message);
+            setLoading(false);
+        }
+    };
+
+    const handleRejectBet = () => {
+        setShowBetPopup(false);
+        navigate("/my-games");
+    };
+
     const handleClick = (pos) => {
         if (!playerSymbol || !gameReady || winner || currentPlayer !== playerSymbol) {
             setError("Not your turn, game not started, or game over!");
+            console.log("Move blocked:", { playerSymbol, gameReady, winner, currentPlayer });
             return;
         }
 
         if (placedPieces[currentPlayer] < 3) {
             if (!pieces[pos]) {
+                console.log("Placing piece at", pos, "by", playerSymbol);
                 socket.emit("makeMove", {
                     pos,
                     player: playerSymbol,
@@ -209,6 +238,7 @@ function GameBoard({ roomId: propRoomId }) {
             }
         } else if (selectedPiece) {
             if (!pieces[pos] && validMoves[selectedPiece]?.includes(pos)) {
+                console.log("Moving piece from", selectedPiece, "to", pos, "by", playerSymbol);
                 socket.emit("makeMove", {
                     pos,
                     player: playerSymbol,
@@ -231,9 +261,30 @@ function GameBoard({ roomId: propRoomId }) {
         navigate("/my-games");
     };
 
+    if (loading) return <div className="gameboard-container">Loading...</div>;
+
+    if (showBetPopup) {
+        return (
+            <div className="bet-popup">
+                <div className="bet-popup-content">
+                    <h3>Join Tournament</h3>
+                    <p>The creator has set an entry fee of <strong>{betAmount}</strong>.</p>
+                    <p>Your balance: {userBalance.toFixed(1)}</p>
+                    {userBalance < betAmount && (
+                        <p style={{ color: "red" }}>
+                            Insufficient balance! <button onClick={() => navigate("/wallet")}>Deposit</button>
+                        </p>
+                    )}
+                    <button onClick={handleAcceptBet} disabled={userBalance < betAmount}>Join</button>
+                    <button onClick={handleRejectBet}>Cancel</button>
+                    {error && <p style={{ color: "red" }}>{error}</p>}
+                </div>
+            </div>
+        );
+    }
+
     if (authLoading) return <div className="gameboard-container">Loading authentication...</div>;
     if (!isAuthenticated || !user) return <div className="gameboard-container">Redirecting to login...</div>;
-    if (loading) return <div className="gameboard-container">Loading game...</div>;
 
     return (
         <div className="gameboard-container">

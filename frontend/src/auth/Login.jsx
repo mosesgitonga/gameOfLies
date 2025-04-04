@@ -6,7 +6,7 @@ const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const { login } = useContext(AuthContext);
+    const { login, fetchWithAuth } = useContext(AuthContext);
     const navigate = useNavigate();
     const location = useLocation(); // To access query params
 
@@ -34,7 +34,7 @@ const Login = () => {
 
             if (userResponse.ok) {
                 console.log("Login response:", userData.user); // Debug response
-                login(data.access_token, userData.user); // Set token and user in context
+                login(data.access_token,data.refresh_token, userData.user); // Set token and user in context
 
                 // Get redirect URL from query params, default to "/"
                 const searchParams = new URLSearchParams(location.search);
