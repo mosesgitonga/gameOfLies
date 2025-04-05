@@ -3,7 +3,9 @@ import { AuthContext } from "../auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import CreateGame from "../components/CreateGame"
 import "./styles/MyGames.css";
-import { basename } from "path";
+// import { basename } from "path";
+
+const base_url = import.meta.env.VITE_BASE_URL;
 
 const MyGames = () => {
     const [userGames, setUserGames] = useState([]);

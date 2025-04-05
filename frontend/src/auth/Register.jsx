@@ -3,6 +3,8 @@ import { AuthContext } from "../auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "./Register.css";
 
+const base_url = import.meta.env.VITE_BASE_URL;
+
 const Register = () => {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
@@ -33,7 +35,7 @@ const Register = () => {
         }
 
         try {
-            const response = await fetch("http://localhost:5000/api/auth/register", {
+            const response = await fetch(`${base_url}/api/auth/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, email, password }),
