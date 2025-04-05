@@ -107,13 +107,13 @@ const Home = () => {
                 <div className={`menuSection ${menuOpen ? "active" : ""}`}>
                     <ul className="menuList">
                         <li className="menuItem" onClick={() => navigate("/my-games")}>
-                            My Games
+                            My Tournaments
                         </li>
                         <li className="menuItem" onClick={() => navigate("/how-to-play")}>
                             How to Play
                         </li>
                         <li className="menuItem" onClick={() => navigate("/game-history")}>
-                            Game History
+                            Tournaments History
                         </li>
                         <li className="menuItem" onClick={() => navigate("/wallet")}>
                             Wallet

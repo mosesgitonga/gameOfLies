@@ -44,9 +44,9 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
+    <div className="register-container">
       <h1>Login</h1>
-      <form className="login-form" onSubmit={handleLogin}>
+      <form className="register-form" onSubmit={handleLogin}>
         <div className="form-group">
           <label htmlFor="email">Email</label>
           <input
@@ -67,7 +67,11 @@ const Login = () => {
             required
           />
         </div>
-        <button type="submit" className="login-button">Login</button>
+        <button type="submit" className="register-button">Login</button>
+        <div className="login-link">
+          Don’t have an account?{" "}
+          <span onClick={() => navigate("/register")}>Register here</span>
+        </div>
       </form>
     </div>
   );

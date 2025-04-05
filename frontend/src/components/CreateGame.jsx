@@ -5,7 +5,7 @@ const base_url = import.meta.env.VITE_BASE_URL;
 
 const CreateGame = ({ onGameCreated }) => {
     const { user } = useContext(AuthContext);
-    const [entryFee, setEntryFee] = useState(0); // Changed from betAmount
+    const [entryFee, setEntryFee] = useState(0);
     const [error, setError] = useState(null);
 
     const handleCreate = async (e) => {
@@ -26,7 +26,7 @@ const CreateGame = ({ onGameCreated }) => {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ player1Id: user.id, betAmount: parseInt(entryFee) }), // Keep betAmount for backend compatibility
+                body: JSON.stringify({ player1Id: user.id, betAmount: parseInt(entryFee) }), 
             });
 
             if (!response.ok) {

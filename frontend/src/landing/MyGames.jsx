@@ -113,7 +113,7 @@ const MyGames = () => {
 
     return (
         <div className="my-games-container">
-            <h1>My Games</h1>
+            <h1>My Tournaments</h1>
             {loading ? (
                 <p>Loading games...</p>
             ) : userGames.length > 0 ? (
