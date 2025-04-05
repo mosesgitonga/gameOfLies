@@ -1,0 +1,212 @@
+nohup: ignoring input
+Server running on HTTPS port 443
+[2025-04-05T10:46:10.146Z] GET /api/games
+[2025-04-05T10:46:10.405Z] GET /api/auth/user
+[2025-04-05T10:46:11.191Z] GET /api/games
+[2025-04-05T10:46:26.836Z] GET /api/user/games/d63bb997-ebf8-4c36-9ae8-3b0320146baa
+Executing Prisma query for Game: { where: { AND: [ [Object], [Object] ], OR: undefined } }
+Query results for Game: []
+[2025-04-05T10:46:30.849Z] GET /api/games
+[2025-04-05T10:47:18.347Z] GET /api/games
+[2025-04-05T10:47:18.638Z] GET /api/auth/user
+[2025-04-05T10:47:19.185Z] GET /api/games
+[2025-04-05T10:48:28.572Z] GET /api/user/games/d63bb997-ebf8-4c36-9ae8-3b0320146baa
+Executing Prisma query for Game: { where: { AND: [ [Object], [Object] ], OR: undefined } }
+Query results for Game: []
+[2025-04-05T10:48:33.040Z] GET /api/games
+[2025-04-05T10:48:44.870Z] GET /api/games
+[2025-04-05T10:49:07.038Z] POST /api/auth/login
+[2025-04-05T10:49:16.734Z] POST /api/auth/login
+[2025-04-05T10:49:17.354Z] GET /api/auth/user
+[2025-04-05T10:49:17.919Z] GET /api/games
+[2025-04-05T10:51:34.062Z] GET /api/games
+[2025-04-05T10:51:34.354Z] GET /api/auth/user
+[2025-04-05T10:51:34.919Z] GET /api/games
+[2025-04-05T10:53:56.645Z] GET /api/games
+[2025-04-05T10:53:56.933Z] GET /api/auth/user
+[2025-04-05T10:53:57.486Z] GET /api/games
+[2025-04-05T10:56:41.756Z] GET /api/auth/user
+A user connected: 0rgraqQC95UMI3yIAAAB
+joinRoom received: {
+  roomId: '493f98a3-d948-498e-9fc6-cfc43073d309',
+  userId: '094919a8-f02e-44e6-a4b2-6ac1a9011a29'
+}
+[2025-04-05T10:56:42.489Z] GET /api/game/493f98a3-d948-498e-9fc6-cfc43073d309
+Game 493f98a3-d948-498e-9fc6-cfc43073d309 fetched: {
+  id: '493f98a3-d948-498e-9fc6-cfc43073d309',
+  player1Id: '9cf5207e-e9a3-4d4a-8683-1e598d468e88',
+  player1Symbol: 'X',
+  player2Id: null,
+  player2Symbol: null,
+  winnerId: null,
+  status: 'pending',
+  state: {
+    pieces: {
+      A: null,
+      B: null,
+      C: null,
+      D: null,
+      E: null,
+      F: null,
+      G: null,
+      H: null,
+      I: null
+    },
+    currentPlayer: 'X',
+    placedPieces: { X: 0, O: 0 }
+  },
+  betAmount: 800,
+  created_at: 2025-04-05T10:33:57.976Z
+}
+A user disconnected: 0rgraqQC95UMI3yIAAAB
+[2025-04-05T10:56:47.740Z] GET /api/auth/user
+[2025-04-05T10:56:51.306Z] GET /api/games
+[2025-04-05T10:56:56.960Z] GET /api/games
+[2025-04-05T10:56:57.176Z] GET /api/auth/user
+[2025-04-05T10:56:57.706Z] GET /api/games
+[2025-04-05T10:58:55.307Z] PROPFIND /
+[2025-04-05T11:00:18.415Z] GET /api/games
+[2025-04-05T11:00:18.700Z] GET /api/auth/user
+[2025-04-05T11:00:19.245Z] GET /api/games
+[2025-04-05T11:03:28.523Z] GET /api/games
+[2025-04-05T11:03:28.782Z] GET /api/auth/user
+[2025-04-05T11:03:29.332Z] GET /api/games
+[2025-04-05T11:03:29.608Z] GET /api/auth/user
+[2025-04-05T11:03:30.160Z] GET /api/games
+[2025-04-05T11:04:10.299Z] GET /api/games
+[2025-04-05T11:04:17.305Z] GET /api/games
+[2025-04-05T11:04:17.632Z] GET /api/auth/user
+[2025-04-05T11:04:18.236Z] GET /api/games
+[2025-04-05T11:08:53.513Z] GET /api/games
+[2025-04-05T11:08:53.854Z] GET /api/auth/user
+[2025-04-05T11:08:54.462Z] GET /api/games
+[2025-04-05T11:08:58.496Z] GET /api/user/games/094919a8-f02e-44e6-a4b2-6ac1a9011a29
+Executing Prisma query for Game: { where: { AND: [ [Object], [Object] ], OR: undefined } }
+Query results for Game: [
+  {
+    id: '527d1059-40fb-4f3b-8c77-6e1527cd9289',
+    player1Id: '094919a8-f02e-44e6-a4b2-6ac1a9011a29',
+    player1Symbol: 'X',
+    player2Id: '5066d80c-b67e-4a54-8702-bed20adc7233',
+    player2Symbol: 'O',
+    winnerId: null,
+    status: 'paused',
+    state: '{"pieces":{"A":null,"B":"X","C":null,"D":null,"E":null,"F":null,"G":null,"H":null,"I":null},"currentPlayer":"O","placedPieces":{"X":1,"O":0}}',
+    betAmount: 250,
+    created_at: 2025-04-05T07:36:40.605Z
+  }
+]
+Games found for userId: 094919a8-f02e-44e6-a4b2-6ac1a9011a29 [
+  {
+    challenger: 'moses',
+    opponent: 'black',
+    gameId: '527d1059-40fb-4f3b-8c77-6e1527cd9289',
+    status: 'paused',
+    player1Symbol: 'X',
+    player2Symbol: 'O',
+    winnerId: null
+  }
+]
+A user connected: DjNrSNfz65q48QDIAAAD
+[2025-04-05T11:09:03.306Z] GET /api/auth/user
+joinRoom received: {
+  roomId: '527d1059-40fb-4f3b-8c77-6e1527cd9289',
+  userId: '094919a8-f02e-44e6-a4b2-6ac1a9011a29'
+}
+[2025-04-05T11:09:03.833Z] GET /api/game/527d1059-40fb-4f3b-8c77-6e1527cd9289
+Game 527d1059-40fb-4f3b-8c77-6e1527cd9289 fetched: {
+  id: '527d1059-40fb-4f3b-8c77-6e1527cd9289',
+  player1Id: '094919a8-f02e-44e6-a4b2-6ac1a9011a29',
+  player1Symbol: 'X',
+  player2Id: '5066d80c-b67e-4a54-8702-bed20adc7233',
+  player2Symbol: 'O',
+  winnerId: null,
+  status: 'paused',
+  state: {
+    pieces: {
+      A: null,
+      B: 'X',
+      C: null,
+      D: null,
+      E: null,
+      F: null,
+      G: null,
+      H: null,
+      I: null
+    },
+    currentPlayer: 'O',
+    placedPieces: { X: 1, O: 0 }
+  },
+  betAmount: 250,
+  created_at: 2025-04-05T07:36:40.605Z
+}
+Emitting assignSymbol to 094919a8-f02e-44e6-a4b2-6ac1a9011a29 with symbol X
+Room 527d1059-40fb-4f3b-8c77-6e1527cd9289 status: { playerCount: 1, gameStarted: false, dbStatus: 'paused' }
+Player 094919a8-f02e-44e6-a4b2-6ac1a9011a29 joined room 527d1059-40fb-4f3b-8c77-6e1527cd9289 as X
+A user disconnected: DjNrSNfz65q48QDIAAAD
+Player 094919a8-f02e-44e6-a4b2-6ac1a9011a29 disconnected from room 527d1059-40fb-4f3b-8c77-6e1527cd9289
+Room 527d1059-40fb-4f3b-8c77-6e1527cd9289 cleared: all players disconnected
+[2025-04-05T11:09:12.918Z] GET /api/user/games/094919a8-f02e-44e6-a4b2-6ac1a9011a29
+Executing Prisma query for Game: { where: { AND: [ [Object], [Object] ], OR: undefined } }
+Query results for Game: [
+  {
+    id: '527d1059-40fb-4f3b-8c77-6e1527cd9289',
+    player1Id: '094919a8-f02e-44e6-a4b2-6ac1a9011a29',
+    player1Symbol: 'X',
+    player2Id: '5066d80c-b67e-4a54-8702-bed20adc7233',
+    player2Symbol: 'O',
+    winnerId: null,
+    status: 'paused',
+    state: '{"pieces":{"A":null,"B":"X","C":null,"D":null,"E":null,"F":null,"G":null,"H":null,"I":null},"currentPlayer":"O","placedPieces":{"X":1,"O":0}}',
+    betAmount: 250,
+    created_at: 2025-04-05T07:36:40.605Z
+  }
+]
+Games found for userId: 094919a8-f02e-44e6-a4b2-6ac1a9011a29 [
+  {
+    challenger: 'moses',
+    opponent: 'black',
+    gameId: '527d1059-40fb-4f3b-8c77-6e1527cd9289',
+    status: 'paused',
+    player1Symbol: 'X',
+    player2Symbol: 'O',
+    winnerId: null
+  }
+]
+[2025-04-05T11:09:13.674Z] GET /api/games
+[2025-04-05T11:09:16.578Z] GET /api/auth/user
+A user connected: hMBf6mnXm9b3BVSTAAAF
+joinRoom received: {
+  roomId: '493f98a3-d948-498e-9fc6-cfc43073d309',
+  userId: '094919a8-f02e-44e6-a4b2-6ac1a9011a29'
+}
+[2025-04-05T11:09:17.284Z] GET /api/game/493f98a3-d948-498e-9fc6-cfc43073d309
+Game 493f98a3-d948-498e-9fc6-cfc43073d309 fetched: {
+  id: '493f98a3-d948-498e-9fc6-cfc43073d309',
+  player1Id: '9cf5207e-e9a3-4d4a-8683-1e598d468e88',
+  player1Symbol: 'X',
+  player2Id: null,
+  player2Symbol: null,
+  winnerId: null,
+  status: 'pending',
+  state: {
+    pieces: {
+      A: null,
+      B: null,
+      C: null,
+      D: null,
+      E: null,
+      F: null,
+      G: null,
+      H: null,
+      I: null
+    },
+    currentPlayer: 'X',
+    placedPieces: { X: 0, O: 0 }
+  },
+  betAmount: 800,
+  created_at: 2025-04-05T10:33:57.976Z
+}
+A user disconnected: hMBf6mnXm9b3BVSTAAAF
+[2025-04-05T11:09:22.321Z] GET /api/games
+[2025-04-05T11:09:31.204Z] GET /api/games

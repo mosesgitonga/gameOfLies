@@ -21,10 +21,11 @@ class Game {
                 return res.status(400).json({ message: "Insufficient balance" });
             }
 
-            const existingActiveGames = await this.engine.getWhere("Game", {
-                OR: [{ player1Id }, { player2Id: player1Id }],
-                status: { in: ["ongoing", "paused"] },
-            });
+	    const existingActiveGames = await this.engine.getWhere("Game", {
+		    player1Id,
+	    	status: { in: ["ongoing", "paused"] },
+	    });
+	    console.log("Existing games: ", existingActiveGames)
             if (existingActiveGames.length > 0) {
                 return res.status(409).json({
                     message: "You are already in an ongoing or paused game.",
@@ -87,11 +88,19 @@ class Game {
             if (user.balance < game.betAmount) {
                 return res.status(400).json({ message: "Insufficient balance to join this game" });
             }
-
-            const existingActiveGames = await this.engine.getWhere("Game", {
-                OR: [{ player1Id: userId }, { player2Id: userId }],
-                status: { in: ["ongoing", "paused"] },
-            });
+	    const existingActiveGames = await this.engine.getWhere("Game", {
+  AND: [
+    {
+      OR: [
+        { player1Id: userId },
+        { player2Id: userId },
+      ],
+    },
+    {
+      status: { in: ["ongoing", "paused"] },
+    },
+  ],
+});
             if (existingActiveGames.length > 0) {
                 return res.status(409).json({
                     message: "You are already in an ongoing or paused game.",
@@ -190,12 +199,14 @@ class Game {
                         OR: [
                             { player1Id: userId },
                             { player2Id: userId },
+			    
                         ],
                     },
                     {
                         OR: [
                             { status: "pending" },
                             { status: "paused" },
+			    { status: "ongoing"},
                         ],
                     },
                 ],
