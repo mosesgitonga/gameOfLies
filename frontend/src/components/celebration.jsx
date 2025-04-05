@@ -61,7 +61,7 @@ const eazyLoseResponses = [
 
 // Function to pick a response with warm ones having a higher chance
 const getWeightedResponse = (warmResponses, coldResponses) => {
-  const isWarm = Math.random() < 0.6; // 50% chance for warm response
+  const isWarm = Math.random() < 0.5; // 50% chance for warm response
   return isWarm
     ? warmResponses[Math.floor(Math.random() * warmResponses.length)]
     : coldResponses[Math.floor(Math.random() * coldResponses.length)];

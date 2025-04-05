@@ -104,7 +104,7 @@ const MyGames = () => {
     if (!isAuthenticated || !user || !user.id) {
         return (
             <div className="my-games-container">
-                <h1>My Games</h1>
+                <h1>My Tournaments</h1>
                 <p>Please log in to view your games.</p>
                 <button onClick={() => navigate("/login")}>Go to Login</button>
             </div>
@@ -150,7 +150,7 @@ const MyGames = () => {
                 </ul>
             ) : (
                 <div className="no-games">
-                    <p>You don’t have any games.</p>
+                    <p>You don’t have any tournaments.</p>
                 </div>
             )}
             {/* Integrate CreateGame component */}

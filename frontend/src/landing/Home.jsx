@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useContext } from "react";
-import { AuthContext } from "../auth/AuthContext"
+import { AuthContext } from "../auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import CreateGame from "../components/CreateGame";
 import "./home.css";
 
 const base_url = import.meta.env.VITE_BASE_URL;
-
 
 const Home = () => {
     const [games, setGames] = useState([]);
@@ -48,7 +47,7 @@ const Home = () => {
     };
 
     const handleGameCreated = (newGame) => {
-        console.log("Game created:", newGame);
+        console.log("Tournament created:", newGame);
         setCreatedGame(newGame);
         setShowCreateGame(false);
         setOpenDropdown("create-game");
@@ -63,7 +62,7 @@ const Home = () => {
 
     const handleCreateGameClick = (e) => {
         e.stopPropagation();
-        console.log("Create Game button clicked, showCreateGame:", showCreateGame);
+        console.log("Create Tournament button clicked, showCreateGame:", showCreateGame);
         if (!isAuthenticated) {
             navigate("/login");
             return;
@@ -89,7 +88,7 @@ const Home = () => {
                         {isAuthenticated ? (
                             <li>
                                 <img
-                                    src="/"
+                                    src="/" // Update with actual profile image if available
                                     alt={user?.username ? user.username : "profile"}
                                     className="profile-icon"
                                 />
@@ -115,47 +114,48 @@ const Home = () => {
                         </li>
                         <li className="menuItem" onClick={() => navigate("/game-history")}>
                             Game History
-                    
                         </li>
                         <li className="menuItem" onClick={() => navigate("/wallet")}>
                             Wallet
                         </li>
                         {isAuthenticated && (
                             <li className="menuItem" onClick={() => handleToggle("create-game")}>
-                                Create Tournament. {/* Changed from "Create Game" */}
-                                {openDropdown === "create-game" && (
-                                    <div className="dropdown" onClick={(e) => e.stopPropagation()}>
-                                        {showCreateGame ? (
-                                            <CreateGame onGameCreated={handleGameCreated} />
-                                        ) : createdGame ? (
-                                            <>
-                                                <p>Tournament created! Share this link:</p>
-                                                <p>{`${window.location.origin}/game/${createdGame.gameId}`}</p>
-                                                <button onClick={copyShareLink}>Copy Link</button>
-                                                <button onClick={() => navigate(`/game/${createdGame.gameId}`)}>
-                                                    Go to Tournament
-                                                </button>
-                                            </>
-                                        ) : (
-                                            <button onClick={handleCreateGameClick}>Start New Tournament</button>
-                                        )}
-                                    </div>
-                                )}
+                                Create Tournament
                             </li>
                         )}
                     </ul>
                 </div>
 
+                {/* Move dropdown outside menuSection for better visibility */}
+                {isAuthenticated && openDropdown === "create-game" && (
+                    <div className="dropdown" onClick={(e) => e.stopPropagation()}>
+                        {showCreateGame ? (
+                            <CreateGame onGameCreated={handleGameCreated} />
+                        ) : createdGame ? (
+                            <>
+                                <p>Tournament created! Share this link:</p>
+                                <p>{`${window.location.origin}/game/${createdGame.gameId}`}</p>
+                                <button onClick={copyShareLink}>Copy Link</button>
+                                <button onClick={() => navigate(`/game/${createdGame.gameId}`)}>
+                                    Go to Tournament
+                                </button>
+                            </>
+                        ) : (
+                            <button onClick={handleCreateGameClick}>Start New Tournament</button>
+                        )}
+                    </div>
+                )}
+
                 <div className="contentContainer">
                     <div className="details">
-                        <h2>Available Tournaments</h2> {/* Changed from "Available Games" */}
+                        <h2>Available Tournaments</h2>
                         {games.length > 0 ? (
                             <ul className="gameList">
                                 {games.map((game) => (
                                     <li key={game.id} className="gameItem">
                                         <span>Creator: {game.challenger}</span>
                                         <span>Status: {game.status}</span>
-                                        <span>Entry Fee: {game.entryAmount}</span> {/* Changed from "Bet Amount" */}
+                                        <span>Entry Fee: {game.entryAmount}</span>
                                         <button onClick={() => navigate(`/game/${game.id}`)}>Join</button>
                                     </li>
                                 ))}

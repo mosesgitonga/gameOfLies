@@ -196,6 +196,7 @@ class Game {
                         OR: [
                             { status: "pending" },
                             { status: "paused" },
+                            { status: "ongoing"}
                         ],
                     },
                 ],

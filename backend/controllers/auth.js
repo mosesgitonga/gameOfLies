@@ -35,7 +35,7 @@ class Auth {
                 password: hashedPassword
             };
     
-            await this.engine.create('User', newData);
+            const newUser = await this.engine.create('User', newData);
             
             // asign role to user
             const role = await this.user.createRole();
@@ -44,9 +44,12 @@ class Auth {
                 return res.status(500).json({ "error": "Role assignment failed" });
             }
     
+            const payload = { id: userId, email, roleId: newUser.role_id};
+            const access_token =  this.helper.generateAccessToken(payload);
+            const refresh_token = await this.helper.generateRefreshToken(payload);
             await this.engine.update("User", userId, { role_id: role.id });
     
-            return res.status(201).json({ "message": "User registered successfully" });
+            return res.status(201).json({ "message": "User registered successfully", access_token, refresh_token });
     
         } catch (error) {
             console.error(error);
