@@ -1,0 +1,127 @@
+:root {
+    --primary-bg: #121212;
+    --secondary-bg: #222;
+    --tertiary-bg: #333;
+    --text-primary: #ecf1f1;
+    --text-secondary: #8f9797;
+    --x-color: rgb(255, 3, 255);
+    --o-color: rgb(115, 255, 0);
+    --error-color: #ff4444;
+    --transition-timing: 0.3s ease;
+    --board-border: rgba(255, 255, 255, 0.1);
+}
+
+/* Main Container */
+.register-container {
+    width: 100%;
+    min-height: 100vh;
+    background: var(--primary-bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(1rem, 2vw, 2rem);
+    color: var(--text-primary);
+}
+
+/* Heading */
+.register-container h1 {
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    margin-bottom: clamp(1rem, 3vw, 1.5rem);
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Form */
+.register-form {
+    background: var(--secondary-bg);
+    padding: clamp(1rem, 2vw, 1.5rem);
+    border-radius: 8px;
+    width: min(90%, 400px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Form Group */
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.form-group input {
+    background: var(--tertiary-bg);
+    border: 1px solid var(--board-border);
+    border-radius: 4px;
+    padding: 0.75rem;
+    color: var(--text-primary);
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    transition: border-color var(--transition-timing);
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--x-color);
+}
+
+/* Button */
+.register-button {
+    background: var(--x-color);
+    color: var(--text-primary);
+    padding: 0.75rem;
+    border: none;
+    border-radius: 4px;
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    cursor: pointer;
+    transition: background var(--transition-timing);
+}
+
+.register-button:hover {
+    background: rgb(200, 0, 200); /* Darker pink on hover */
+}
+
+/* Messages */
+.error-message {
+    color: var(--error-color);
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.success-message {
+    color: var(--o-color);
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+    text-align: center;
+    margin-top: 1rem;
+}
+
+/* Login Link */
+.login-link {
+    margin-top: 1rem;
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+    color: var(--text-secondary);
+}
+
+.login-link span {
+    color: var(--o-color);
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.login-link span:hover {
+    color: rgb(90, 200, 0); /* Darker green on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .register-form {
+        width: 90%;
+    }
+}

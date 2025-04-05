@@ -7,6 +7,7 @@ import MyGames from "./landing/MyGames";
 import HowToPlay from "./landing/HowToPlay";
 import Wallet from "./pages/wallet/Wallet";
 import GameHistory from "./pages/gameHistory/GameHistory";
+import Register from "./auth/Register";
 
 
 const App = () => {
@@ -19,6 +20,7 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/wallet" element={<Wallet />} />
         <Route path="/game-history" element={<GameHistory />} />
+        <Route path="/register" element={<Register />} />
 
       </Routes>
   );
