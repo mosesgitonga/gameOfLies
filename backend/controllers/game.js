@@ -89,18 +89,18 @@ class Game {
                 return res.status(400).json({ message: "Insufficient balance to join this game" });
             }
 	    const existingActiveGames = await this.engine.getWhere("Game", {
-  AND: [
-    {
-      OR: [
-        { player1Id: userId },
-        { player2Id: userId },
-      ],
-    },
-    {
-      status: { in: ["ongoing", "paused"] },
-    },
-  ],
-});
+                AND: [
+                    {
+                    OR: [
+                        { player1Id: userId },
+                        { player2Id: userId },
+                    ],
+                    },
+                    {
+                    status: { in: ["ongoing", "paused"] },
+                    },
+                ],
+                });
             if (existingActiveGames.length > 0) {
                 return res.status(409).json({
                     message: "You are already in an ongoing or paused game.",
@@ -206,7 +206,7 @@ class Game {
                         OR: [
                             { status: "pending" },
                             { status: "paused" },
-			    { status: "ongoing"},
+			                 { status: "ongoing"},
                         ],
                     },
                 ],
