@@ -31,7 +31,7 @@ class Game {
                     message: "You are already in an ongoing or paused game.",
                     gameId: existingActiveGames[0].id,
                 });
-            }
+            }  
 
             const existingPendingGame = await this.engine.getWhere("Game", {
                 player1Id,
